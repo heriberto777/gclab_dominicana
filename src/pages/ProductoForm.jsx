@@ -69,6 +69,17 @@ const ProductoForm = () => {
           } else if (producto.imagen_principal) {
             setImagenes([producto.imagen_principal]);
           }
+
+          if (producto.proveedores && Array.isArray(producto.proveedores)) {
+            const proveedoresData = producto.proveedores.map(prov => ({
+              proveedor_id: prov.id,
+              precio: prov.precio || '',
+              moneda: prov.moneda || 'USD',
+              codigo_producto: prov.codigo_producto || '',
+              disponible: prov.disponible !== false
+            }));
+            setSelectedProveedores(proveedoresData);
+          }
         }
       }
     } catch (err) {
@@ -159,6 +170,7 @@ const ProductoForm = () => {
         categoria_id: formData.categoria_id || null,
         imagen_principal: imagenPrincipal,
         imagenes_adicionales: validImagenes,
+        proveedores: selectedProveedores,
         activo: formData.activo,
         destacado: formData.destacado,
       };
