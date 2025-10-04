@@ -1,0 +1,191 @@
+.productos-page {
+  width: 100%;
+}
+
+.productos-intro {
+  max-width: 900px;
+  margin: 0 auto 60px;
+  text-align: center;
+}
+
+.productos-main-title {
+  font-size: 48px;
+  font-weight: 700;
+  color: #0066cc;
+  margin: 0 0 32px 0;
+}
+
+.productos-description {
+  font-size: 17px;
+  line-height: 1.8;
+  color: #333;
+  margin: 0;
+}
+
+.categorias-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.categoria-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 24px;
+}
+
+.categoria-icon {
+  margin-bottom: 24px;
+}
+
+.categoria-icon img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+}
+
+.categoria-titulo {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0066cc;
+  margin: 0 0 24px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.marcas-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: center;
+  justify-items: center;
+}
+
+.marca-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  transition: transform 0.3s ease;
+}
+
+.marca-item:hover {
+  transform: scale(1.05);
+}
+
+.marca-item img {
+  max-width: 120px;
+  height: auto;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.marca-item:hover img {
+  opacity: 1;
+}
+
+.categoria-placeholder,
+.marca-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 48px;
+  font-weight: 700;
+  border-radius: 12px;
+}
+
+.marca-placeholder {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px;
+  width: 120px;
+  height: 80px;
+}
+
+@media (max-width: 1200px) {
+  .categorias-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+
+  .marcas-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+}
+
+@media (max-width: 968px) {
+  .productos-main-title {
+    font-size: 36px;
+  }
+
+  .productos-description {
+    font-size: 16px;
+  }
+
+  .categorias-grid {
+    gap: 24px;
+  }
+
+  .categoria-titulo {
+    font-size: 14px;
+    min-height: 40px;
+  }
+
+  .marcas-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .productos-intro {
+    padding: 0 16px;
+  }
+
+  .productos-main-title {
+    font-size: 28px;
+  }
+
+  .productos-description {
+    font-size: 15px;
+  }
+
+  .categorias-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .categoria-card {
+    padding: 24px 16px;
+  }
+
+  .categoria-icon img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .marcas-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .marca-item img {
+    max-width: 100px;
+  }
+}

@@ -1,0 +1,328 @@
+.home {
+  width: 100%;
+}
+
+.quienes-somos-section {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.mission-text {
+  font-size: 24px;
+  line-height: 1.6;
+  color: #333;
+  margin: 0 0 32px 0;
+  font-weight: 400;
+}
+
+.section-main-title {
+  font-size: 42px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 32px 0;
+  text-align: center;
+}
+
+.seguridad-section .intro-text {
+  font-size: 18px;
+  line-height: 1.7;
+  color: #555;
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto 48px;
+}
+
+.industrias-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-top: 48px;
+}
+
+.industria-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.industria-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.industria-icon {
+  margin-bottom: 20px;
+}
+
+.icon-placeholder {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+  border-radius: 50%;
+}
+
+.industria-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 20px 0;
+  line-height: 1.4;
+  white-space: pre-line;
+  min-height: 44px;
+}
+
+.saber-mas-btn {
+  color: #0066cc;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  padding: 8px 20px;
+  border: 2px solid #0066cc;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.saber-mas-btn:hover {
+  background: #0066cc;
+  color: white;
+}
+
+.productos-servicios-section {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.tabs-container {
+  margin-top: 48px;
+}
+
+.tabs-header {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 48px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.tab-button {
+  padding: 16px 40px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.tab-button.active {
+  color: #0066cc;
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #0066cc;
+}
+
+.tab-button:hover {
+  color: #0066cc;
+}
+
+.tab-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.tab-image {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.tab-image img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+.tab-text p {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #555;
+}
+
+.proteccion-section {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.proteccion-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+  margin-bottom: 80px;
+}
+
+.proteccion-item:last-child {
+  margin-bottom: 0;
+}
+
+.proteccion-item-reverse {
+  direction: rtl;
+}
+
+.proteccion-item-reverse > * {
+  direction: ltr;
+}
+
+.proteccion-image {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.proteccion-image img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+.proteccion-content h3 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0066cc;
+  margin: 0 0 20px 0;
+}
+
+.proteccion-content p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #555;
+}
+
+.marcas-section {
+  text-align: center;
+}
+
+.marcas-carousel {
+  margin-top: 48px;
+  overflow: hidden;
+  padding: 24px 0;
+}
+
+.marcas-track {
+  display: flex;
+  gap: 48px;
+  animation: scroll 30s linear infinite;
+}
+
+.marca-item {
+  flex-shrink: 0;
+  width: 200px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.marca-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: grayscale(100%);
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.marca-item:hover img {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 968px) {
+  .mission-text {
+    font-size: 20px;
+  }
+
+  .section-main-title {
+    font-size: 32px;
+  }
+
+  .industrias-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .tab-panel {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .tab-image img {
+    height: 300px;
+  }
+
+  .proteccion-item,
+  .proteccion-item-reverse {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    direction: ltr;
+  }
+
+  .proteccion-image img {
+    height: 300px;
+  }
+
+  .marcas-track {
+    gap: 32px;
+  }
+
+  .marca-item {
+    width: 150px;
+    height: 80px;
+  }
+}
+
+@media (max-width: 640px) {
+  .industrias-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tabs-header {
+    flex-direction: column;
+  }
+
+  .tab-button {
+    padding: 12px 24px;
+  }
+}

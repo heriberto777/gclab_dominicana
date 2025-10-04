@@ -1,0 +1,41 @@
+.section-title {
+  margin-bottom: 48px;
+}
+
+.section-title-center {
+  text-align: center;
+}
+
+.section-title-left {
+  text-align: left;
+}
+
+.section-title-main {
+  font-size: 40px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+}
+
+.section-title-subtitle {
+  font-size: 18px;
+  color: #666;
+  line-height: 1.6;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.section-title-left .section-title-subtitle {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .section-title-main {
+    font-size: 32px;
+  }
+
+  .section-title-subtitle {
+    font-size: 16px;
+  }
+}
