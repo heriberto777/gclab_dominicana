@@ -280,4 +280,10 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+export const api = {
+  get: (endpoint) => apiClient.request(endpoint),
+  post: (endpoint, data) => apiClient.request(endpoint, { method: 'POST', body: JSON.stringify(data) }),
+  put: (endpoint, data) => apiClient.request(endpoint, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (endpoint) => apiClient.request(endpoint, { method: 'DELETE' })
+};
 export default apiClient;

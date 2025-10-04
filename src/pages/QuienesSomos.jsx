@@ -1,9 +1,29 @@
+import { useState, useEffect } from 'react';
 import Hero from '../components/organisms/Hero';
 import PageSection from '../components/templates/PageSection';
 import SectionTitle from '../components/molecules/SectionTitle';
+import { api } from '../lib/api';
 import './QuienesSomos.css';
 
 const QuienesSomos = () => {
+  const [proveedores, setProveedores] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProveedores = async () => {
+      try {
+        const data = await api.get('/proveedores?activo=true');
+        setProveedores(data);
+      } catch (error) {
+        console.error('Error al cargar proveedores:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProveedores();
+  }, []);
+
   return (
     <div className="quienes-somos">
       <Hero
@@ -80,37 +100,35 @@ const QuienesSomos = () => {
       <PageSection background="gray">
         <SectionTitle title="NUESTROS PROVEEDORES" />
         <div className="proveedores-content">
-          <div className="proveedores-grid">
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=TA+Instruments" alt="TA Instruments" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=SCION+Instruments" alt="SCION Instruments" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=KNAUER" alt="KNAUER" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=BRUKER" alt="BRUKER" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=ERWEKA" alt="ERWEKA" /></div>
-
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=Biotage" alt="Biotage" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=GBC" alt="GBC" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=MoistTech" alt="MoistTech Corp" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=KRUSS" alt="KRUSS" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=SWISSGAS" alt="SWISSGAS" /></div>
-
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=Thermo+Scientific" alt="Thermo Scientific" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=Fisher+Scientific" alt="Fisher Scientific" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=LABCONCO" alt="LABCONCO" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=Lovibond" alt="Lovibond" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=OHAUS" alt="OHAUS" /></div>
-
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=Cole-Parmer" alt="Cole-Parmer" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=CORNING" alt="CORNING" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=Cytiva" alt="Cytiva" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=Honeywell" alt="Honeywell" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=RAYPA" alt="RAYPA" /></div>
-
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=Environmental" alt="Environmental Express" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=Koehler" alt="Koehler" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=Leica" alt="Leica Microsystems" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=Yamato" alt="Yamato" /></div>
-            <div className="proveedor-logo"><img src="https://via.placeholder.com/150x80/ffffff/0066cc?text=Masterflex" alt="Masterflex" /></div>
-          </div>
+          {loading ? (
+            <p className="loading-message">Cargando proveedores...</p>
+          ) : proveedores.length > 0 ? (
+            <div className="proveedores-grid">
+              {proveedores.map((proveedor) => (
+                <a
+                  key={proveedor.id}
+                  href={proveedor.sitio_web}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="proveedor-logo"
+                  title={proveedor.nombre}
+                >
+                  {proveedor.logo_url ? (
+                    <img
+                      src={proveedor.logo_url}
+                      alt={proveedor.nombre}
+                    />
+                  ) : (
+                    <div className="proveedor-name-fallback">
+                      {proveedor.nombre}
+                    </div>
+                  )}
+                </a>
+              ))}
+            </div>
+          ) : (
+            <p className="no-proveedores">No hay proveedores disponibles en este momento.</p>
+          )}
         </div>
       </PageSection>
     </div>
