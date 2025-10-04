@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
+import { apiClient } from '../lib/api';
 import Button from '../components/atoms/Button';
 import './Admin.css';
 
@@ -30,10 +30,10 @@ const Admin = () => {
     setLoading(true);
     try {
       const [productosRes, categoriasRes, proveedoresRes, settingsRes] = await Promise.all([
-        supabase.from('productos').select('*, categorias(nombre)').order('created_at', { ascending: false }),
-        supabase.from('categorias').select('*').order('orden'),
-        supabase.from('proveedores').select('*').order('nombre'),
-        supabase.from('settings').select('*'),
+        apiClient.getProductos({ activo: false }),
+        apiClient.getCategorias(false),
+        apiClient.getProveedores(false),
+        apiClient.getSettings(),
       ]);
 
       if (productosRes.data) setProductos(productosRes.data);
@@ -62,46 +62,53 @@ const Admin = () => {
   };
 
   const handleToggleActivo = async (table, id, currentValue) => {
-    const { error } = await supabase
-      .from(table)
-      .update({ activo: !currentValue })
-      .eq('id', id);
+    try {
+      const updateMethods = {
+        productos: apiClient.updateProducto,
+        categorias: apiClient.updateCategoria,
+        proveedores: apiClient.updateProveedor,
+      };
 
-    if (!error) {
-      loadData();
+      const updateMethod = updateMethods[table];
+      if (updateMethod) {
+        await updateMethod.call(apiClient, id, { activo: !currentValue });
+        loadData();
+      }
+    } catch (error) {
+      console.error('Error toggling activo:', error);
+      alert('Error al actualizar el estado');
     }
   };
 
   const handleDelete = async (table, id) => {
     if (!confirm('¿Está seguro de eliminar este elemento?')) return;
 
-    const { error } = await supabase
-      .from(table)
-      .delete()
-      .eq('id', id);
+    try {
+      const deleteMethods = {
+        productos: apiClient.deleteProducto,
+        categorias: apiClient.deleteCategoria,
+        proveedores: apiClient.deleteProveedor,
+      };
 
-    if (!error) {
-      loadData();
+      const deleteMethod = deleteMethods[table];
+      if (deleteMethod) {
+        await deleteMethod.call(apiClient, id);
+        loadData();
+      }
+    } catch (error) {
+      console.error('Error deleting:', error);
+      alert(error.message || 'Error al eliminar el elemento');
     }
   };
 
   const handleSaveWebhook = async () => {
     setSavingWebhook(true);
     try {
-      const updates = [
-        supabase.from('settings').update({ value: webhookUrl }).eq('key', 'n8n_webhook_url'),
-        supabase.from('settings').update({ value: contactWebhookUrl }).eq('key', 'contact_webhook_url')
-      ];
-
-      const results = await Promise.all(updates);
-      const hasError = results.some(result => result.error);
-
-      if (hasError) {
-        console.error('Error saving webhook:', results);
-        alert('Error al guardar la configuración');
-      } else {
-        alert('Configuración guardada exitosamente');
-      }
+      await Promise.all([
+        apiClient.updateSetting('n8n_webhook_url', webhookUrl),
+        apiClient.updateSetting('contact_webhook_url', contactWebhookUrl)
+      ]);
+      alert('Configuración guardada exitosamente');
     } catch (error) {
       console.error('Error:', error);
       alert('Error al guardar la configuración');

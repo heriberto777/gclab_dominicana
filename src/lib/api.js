@@ -136,6 +136,11 @@ class ApiClient {
     return { data, error: null };
   }
 
+  async getCategoriaBySlug(slug) {
+    const data = await this.request(`/categorias/slug/${slug}`);
+    return { data, error: null };
+  }
+
   async createCategoria(categoria) {
     const data = await this.request('/categorias', {
       method: 'POST',

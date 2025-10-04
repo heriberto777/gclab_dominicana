@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { apiClient } from '../lib/api';
 import Hero from '../components/organisms/Hero';
 import PageSection from '../components/templates/PageSection';
 import Button from '../components/atoms/Button';
@@ -20,41 +20,17 @@ const ProductoDetail = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const { data: catData } = await supabase
-        .from('categorias')
-        .select('*')
-        .eq('slug', categoria)
-        .eq('activo', true)
-        .single();
+      const { data: catData, error: catError } = await apiClient.getCategoriaBySlug(categoria);
 
-      if (catData) {
+      if (catData && !catError) {
         setCategoriaData(catData);
 
-        const { data: productsData } = await supabase
-          .from('productos')
-          .select(`
-            *,
-            producto_proveedores (
-              proveedor_id,
-              precio,
-              moneda,
-              codigo_producto,
-              disponible,
-              proveedores (
-                id,
-                nombre,
-                slug,
-                logo_url,
-                sitio_web
-              )
-            )
-          `)
-          .eq('categoria_id', catData.id)
-          .eq('activo', true)
-          .order('destacado', { ascending: false })
-          .order('nombre');
+        const { data: productsData, error: productsError } = await apiClient.getProductos({
+          categoria: categoria,
+          activo: true
+        });
 
-        if (productsData) {
+        if (productsData && !productsError) {
           setProductos(productsData);
         }
       }

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/atoms/Button';
 import './AdminLogin.css';
 
 const AdminRegister = () => {
+  const { signUp } = useAuth();
   const [email, setEmail] = useState('admin@gclab.com');
   const [password, setPassword] = useState('Admin123!');
   const [confirmPassword, setConfirmPassword] = useState('Admin123!');
@@ -30,19 +31,21 @@ const AdminRegister = () => {
 
     setLoading(true);
 
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    try {
+      const { data, error: signUpError } = await signUp(email, password);
 
-    if (signUpError) {
-      setError(signUpError.message);
+      if (signUpError) {
+        setError(signUpError.message || 'Error al crear usuario');
+        setLoading(false);
+      } else {
+        setSuccess('Usuario creado exitosamente. Redirigiendo al panel...');
+        setTimeout(() => {
+          navigate('/admin');
+        }, 2000);
+      }
+    } catch (err) {
+      setError(err.message || 'Error al crear usuario');
       setLoading(false);
-    } else {
-      setSuccess('Usuario creado exitosamente. Redirigiendo al login...');
-      setTimeout(() => {
-        navigate('/admin/login');
-      }, 2000);
     }
   };
 

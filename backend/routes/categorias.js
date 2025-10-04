@@ -23,6 +23,22 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/slug/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const result = await pool.query('SELECT * FROM categorias WHERE slug = $1', [slug]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Categoría no encontrada' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error al obtener categoría:', error);
+    res.status(500).json({ error: 'Error al obtener categoría' });
+  }
+});
+
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;

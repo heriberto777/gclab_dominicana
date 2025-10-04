@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { apiClient } from '../lib/api';
 import Hero from '../components/organisms/Hero';
 import PageSection from '../components/templates/PageSection';
 import SectionTitle from '../components/molecules/SectionTitle';
@@ -20,8 +20,8 @@ const Productos = () => {
   const loadData = async () => {
     try {
       const [categoriasRes, proveedoresRes] = await Promise.all([
-        supabase.from('categorias').select('*').eq('activo', true).order('orden'),
-        supabase.from('proveedores').select('*').eq('activo', true).order('nombre'),
+        apiClient.getCategorias(true),
+        apiClient.getProveedores(true),
       ]);
 
       if (categoriasRes.data) {
