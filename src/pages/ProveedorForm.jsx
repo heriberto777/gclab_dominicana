@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
+import { apiClient } from '../lib/api';
 import Button from '../components/atoms/Button';
 import './AdminForm.css';
 
@@ -37,11 +37,7 @@ const ProveedorForm = () => {
   const loadProveedor = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('proveedores')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const { data, error } = await apiClient.getProveedor(id);
 
       if (error) throw error;
 
@@ -98,19 +94,10 @@ const ProveedorForm = () => {
       };
 
       if (isEdit) {
-        const { error: updateError } = await supabase
-          .from('proveedores')
-          .update(dataToSave)
-          .eq('id', id);
-
-        if (updateError) throw updateError;
+        await apiClient.updateProveedor(id, dataToSave);
         setSuccess('Proveedor actualizado exitosamente');
       } else {
-        const { error: insertError } = await supabase
-          .from('proveedores')
-          .insert([dataToSave]);
-
-        if (insertError) throw insertError;
+        await apiClient.createProveedor(dataToSave);
         setSuccess('Proveedor creado exitosamente');
       }
 

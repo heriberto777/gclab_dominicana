@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
+import { apiClient } from '../lib/api';
 import Button from '../components/atoms/Button';
 import './AdminForm.css';
 
@@ -42,19 +42,15 @@ const ProductoForm = () => {
     setLoading(true);
     try {
       const [categoriasRes, proveedoresRes] = await Promise.all([
-        supabase.from('categorias').select('*').order('nombre'),
-        supabase.from('proveedores').select('*').order('nombre'),
+        apiClient.getCategorias(false),
+        apiClient.getProveedores(false),
       ]);
 
       if (categoriasRes.data) setCategorias(categoriasRes.data);
       if (proveedoresRes.data) setProveedores(proveedoresRes.data);
 
       if (isEdit && id) {
-        const { data: producto } = await supabase
-          .from('productos')
-          .select('*, producto_proveedores(*)')
-          .eq('id', id)
-          .single();
+        const { data: producto } = await apiClient.getProducto(id);
 
         if (producto) {
           setFormData({
@@ -67,22 +63,10 @@ const ProductoForm = () => {
             destacado: producto.destacado,
           });
 
-          if (producto.imagenes && Array.isArray(producto.imagenes) && producto.imagenes.length > 0) {
-            setImagenes(producto.imagenes);
+          if (producto.imagenes_adicionales && Array.isArray(producto.imagenes_adicionales) && producto.imagenes_adicionales.length > 0) {
+            setImagenes(producto.imagenes_adicionales);
           } else if (producto.imagen_principal) {
             setImagenes([producto.imagen_principal]);
-          }
-
-          if (producto.producto_proveedores) {
-            setSelectedProveedores(
-              producto.producto_proveedores.map((pp) => ({
-                proveedor_id: pp.proveedor_id,
-                precio: pp.precio || '',
-                moneda: pp.moneda || 'USD',
-                codigo_producto: pp.codigo_producto || '',
-                disponible: pp.disponible,
-              }))
-            );
           }
         }
       }
@@ -165,71 +149,23 @@ const ProductoForm = () => {
     setLoading(true);
 
     try {
-      let productoId = id;
-
       const validImagenes = imagenes.filter(img => img && img.trim() !== '');
       const imagenPrincipal = validImagenes[0] || '';
 
-      if (isEdit) {
-        const { error: updateError } = await supabase
-          .from('productos')
-          .update({
-            nombre: formData.nombre,
-            slug: formData.slug,
-            categoria_id: formData.categoria_id || null,
-            descripcion: formData.descripcion,
-            imagen_principal: imagenPrincipal,
-            imagenes: validImagenes,
-            activo: formData.activo,
-            destacado: formData.destacado,
-          })
-          .eq('id', id);
+      const productoData = {
+        nombre: formData.nombre,
+        descripcion: formData.descripcion,
+        categoria_id: formData.categoria_id || null,
+        imagen_principal: imagenPrincipal,
+        imagenes_adicionales: validImagenes,
+        activo: formData.activo,
+        destacado: formData.destacado,
+      };
 
-        if (updateError) throw updateError;
+      if (isEdit) {
+        await apiClient.updateProducto(id, productoData);
       } else {
-        const { data: newProducto, error: insertError } = await supabase
-          .from('productos')
-          .insert([
-            {
-              nombre: formData.nombre,
-              slug: formData.slug,
-              categoria_id: formData.categoria_id || null,
-              descripcion: formData.descripcion,
-              imagen_principal: imagenPrincipal,
-              imagenes: validImagenes,
-              activo: formData.activo,
-              destacado: formData.destacado,
-            },
-          ])
-          .select()
-          .single();
-
-        if (insertError) throw insertError;
-        productoId = newProducto.id;
-      }
-
-      if (isEdit) {
-        await supabase
-          .from('producto_proveedores')
-          .delete()
-          .eq('producto_id', productoId);
-      }
-
-      if (selectedProveedores.length > 0) {
-        const proveedoresData = selectedProveedores.map((sp) => ({
-          producto_id: productoId,
-          proveedor_id: sp.proveedor_id,
-          precio: sp.precio ? parseFloat(sp.precio) : null,
-          moneda: sp.moneda,
-          codigo_producto: sp.codigo_producto,
-          disponible: sp.disponible,
-        }));
-
-        const { error: provError } = await supabase
-          .from('producto_proveedores')
-          .insert(proveedoresData);
-
-        if (provError) throw provError;
+        await apiClient.createProducto(productoData);
       }
 
       setSuccess(

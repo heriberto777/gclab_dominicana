@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Header from '../organisms/Header';
 import Footer from '../organisms/Footer';
 import ChatBot from '../molecules/ChatBot';
-import { supabase } from '../../lib/supabase';
+import { apiClient } from '../../lib/api';
 import './MainLayout.css';
 
 const MainLayout = () => {
@@ -11,14 +11,13 @@ const MainLayout = () => {
 
   useEffect(() => {
     const fetchWebhookUrl = async () => {
-      const { data } = await supabase
-        .from('settings')
-        .select('value')
-        .eq('key', 'n8n_webhook_url')
-        .maybeSingle();
-
-      if (data) {
-        setWebhookUrl(data.value);
+      try {
+        const { data } = await apiClient.getSetting('n8n_webhook_url');
+        if (data) {
+          setWebhookUrl(data.value);
+        }
+      } catch (error) {
+        console.error('Error fetching webhook URL:', error);
       }
     };
 

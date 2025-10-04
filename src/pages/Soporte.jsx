@@ -3,7 +3,7 @@ import Hero from '../components/organisms/Hero';
 import PageSection from '../components/templates/PageSection';
 import SectionTitle from '../components/molecules/SectionTitle';
 import Button from '../components/atoms/Button';
-import { supabase } from '../lib/supabase';
+import { apiClient } from '../lib/api';
 import './Soporte.css';
 
 const Soporte = () => {
@@ -21,14 +21,13 @@ const Soporte = () => {
 
   useEffect(() => {
     const fetchWebhookUrl = async () => {
-      const { data } = await supabase
-        .from('settings')
-        .select('value')
-        .eq('key', 'contact_webhook_url')
-        .maybeSingle();
-
-      if (data) {
-        setWebhookUrl(data.value);
+      try {
+        const { data } = await apiClient.getSetting('contact_webhook_url');
+        if (data) {
+          setWebhookUrl(data.value);
+        }
+      } catch (error) {
+        console.error('Error fetching webhook URL:', error);
       }
     };
 

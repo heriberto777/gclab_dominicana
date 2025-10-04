@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
+import { apiClient } from '../lib/api';
 import Button from '../components/atoms/Button';
 import './AdminForm.css';
 
@@ -37,11 +37,7 @@ const CategoriaForm = () => {
   const loadCategoria = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('categorias')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const { data, error } = await apiClient.getCategoria(id);
 
       if (error) throw error;
 
@@ -98,19 +94,10 @@ const CategoriaForm = () => {
       };
 
       if (isEdit) {
-        const { error: updateError } = await supabase
-          .from('categorias')
-          .update(dataToSave)
-          .eq('id', id);
-
-        if (updateError) throw updateError;
+        await apiClient.updateCategoria(id, dataToSave);
         setSuccess('Categoría actualizada exitosamente');
       } else {
-        const { error: insertError } = await supabase
-          .from('categorias')
-          .insert([dataToSave]);
-
-        if (insertError) throw insertError;
+        await apiClient.createCategoria(dataToSave);
         setSuccess('Categoría creada exitosamente');
       }
 

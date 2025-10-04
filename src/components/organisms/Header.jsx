@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
+import { apiClient } from '../../lib/api';
 import Logo from '../atoms/Logo';
 import NavItem from '../molecules/NavItem';
 import Icon from '../atoms/Icon';
@@ -16,11 +16,7 @@ const Header = () => {
 
   const loadCategorias = async () => {
     try {
-      const { data } = await supabase
-        .from('categorias')
-        .select('id, nombre, slug')
-        .eq('activo', true)
-        .order('orden');
+      const { data } = await apiClient.getCategorias(true);
 
       if (data) {
         setCategorias(data);
