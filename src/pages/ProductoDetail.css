@@ -67,13 +67,56 @@
 
 .producto-descripcion {
   margin: 0 0 32px 0;
+  font-size: 16px;
+  color: #333;
+  line-height: 1.8;
 }
 
 .producto-descripcion p {
-  font-size: 16px;
-  color: #333;
+  margin: 0 0 16px 0;
+}
+
+.producto-descripcion h1,
+.producto-descripcion h2,
+.producto-descripcion h3,
+.producto-descripcion h4 {
+  color: #0066cc;
+  margin: 24px 0 16px 0;
+  font-weight: 600;
+}
+
+.producto-descripcion h1 {
+  font-size: 24px;
+}
+
+.producto-descripcion h2 {
+  font-size: 20px;
+}
+
+.producto-descripcion h3 {
+  font-size: 18px;
+}
+
+.producto-descripcion ul,
+.producto-descripcion ol {
+  margin: 0 0 20px 0;
+  padding-left: 24px;
+}
+
+.producto-descripcion li {
+  margin-bottom: 8px;
   line-height: 1.6;
-  margin: 0;
+}
+
+.producto-descripcion strong,
+.producto-descripcion b {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.producto-descripcion em,
+.producto-descripcion i {
+  font-style: italic;
 }
 
 .producto-proveedores-container {
@@ -150,10 +193,76 @@
   height: auto;
 }
 
+.producto-proveedores-section {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 2px solid #e2e8f0;
+}
+
+.proveedores-titulo {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 20px 0;
+}
+
+.producto-proveedores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.proveedor-card-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.proveedor-card-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #0066cc;
+}
+
+.proveedor-logo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  padding: 12px;
+  background: #f7fafc;
+  border-radius: 8px;
+}
+
+.proveedor-logo-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.proveedor-name-placeholder {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0066cc;
+  text-align: center;
+}
+
+.proveedor-precio {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+  text-align: center;
+}
+
 .producto-categoria-imagen {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .producto-categoria-imagen img {

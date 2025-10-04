@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { apiClient } from '../lib/api';
 import Button from '../components/atoms/Button';
+import RichTextEditor from '../components/molecules/RichTextEditor';
 import './AdminForm.css';
 
 const ProductoForm = () => {
@@ -262,13 +263,10 @@ const ProductoForm = () => {
 
           <div className="form-group">
             <label htmlFor="descripcion">Descripción</label>
-            <textarea
-              id="descripcion"
-              name="descripcion"
+            <RichTextEditor
               value={formData.descripcion}
-              onChange={handleChange}
-              rows="4"
-              disabled={loading}
+              onChange={(value) => setFormData(prev => ({ ...prev, descripcion: value }))}
+              placeholder="Escribe una descripción detallada del producto..."
             />
           </div>
 

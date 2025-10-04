@@ -40,7 +40,7 @@ const MainLayout = () => {
         <Outlet />
       </main>
       <Footer />
-      {chatbotEnabled && webhookUrl && <ChatBot webhookUrl={webhookUrl} />}
+      {chatbotEnabled && <ChatBot webhookUrl={webhookUrl} />}
     </div>
   );
 };

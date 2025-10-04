@@ -20,7 +20,7 @@ const ProductoDetail = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const { data: catData, error: catError } = await apiClient.getCategoriaBySlug(categoria);
+      const { data: catData, error: catError} = await apiClient.getCategoriaBySlug(categoria);
 
       if (catData && !catError) {
         setCategoriaData(catData);
@@ -98,63 +98,47 @@ const ProductoDetail = () => {
                   <h2 className="producto-categoria-titulo">{producto.nombre.toUpperCase()}</h2>
 
                   {producto.descripcion && (
-                    <div className="producto-descripcion">
-                      {producto.descripcion.split('\n').map((line, idx) => {
-                        if (line.trim().startsWith('-') || line.trim().startsWith('•')) {
-                          return <li key={idx}>{line.replace(/^[-•]\s*/, '')}</li>;
-                        }
-                        return null;
-                      }).filter(Boolean).length > 0 ? (
-                        <ul className="producto-categoria-lista">
-                          {producto.descripcion.split('\n').map((line, idx) => {
-                            if (line.trim().startsWith('-') || line.trim().startsWith('•')) {
-                              return <li key={idx}>{line.replace(/^[-•]\s*/, '')}</li>;
-                            }
-                            return null;
-                          })}
-                        </ul>
-                      ) : (
-                        <p>{producto.descripcion}</p>
-                      )}
-                    </div>
+                    <div
+                      className="producto-descripcion"
+                      dangerouslySetInnerHTML={{ __html: producto.descripcion }}
+                    />
                   )}
 
-                  {producto.producto_proveedores && producto.producto_proveedores.length > 0 && (
-                    <div className="producto-proveedores-container">
-                      <div className="producto-proveedores-logos">
-                        {producto.producto_proveedores
-                          .filter(pp => pp.proveedores && pp.disponible)
-                          .map((pp, idx) => (
-                            <div key={idx} className="proveedor-logo-item">
-                              {pp.proveedores.logo_url ? (
-                                <img
-                                  src={pp.proveedores.logo_url}
-                                  alt={pp.proveedores.nombre}
-                                  title={pp.proveedores.nombre}
-                                />
-                              ) : (
-                                <div className="proveedor-logo-placeholder">
-                                  {pp.proveedores.nombre}
-                                </div>
+                  {producto.proveedores && producto.proveedores.length > 0 && (
+                    <div className="producto-proveedores-section">
+                      <h3 className="proveedores-titulo">Proveedores Disponibles:</h3>
+                      <div className="producto-proveedores-grid">
+                        {producto.proveedores
+                          .filter(prov => prov.disponible !== false)
+                          .map((proveedor, idx) => (
+                            <div key={idx} className="proveedor-card-item">
+                              <div className="proveedor-logo-wrapper">
+                                {proveedor.logo_url ? (
+                                  <img
+                                    src={proveedor.logo_url}
+                                    alt={proveedor.nombre}
+                                    title={proveedor.nombre}
+                                  />
+                                ) : (
+                                  <div className="proveedor-name-placeholder">
+                                    {proveedor.nombre}
+                                  </div>
+                                )}
+                              </div>
+                              {proveedor.sitio_web && (
+                                <Button
+                                  onClick={() => window.open(proveedor.sitio_web, '_blank', 'noopener,noreferrer')}
+                                  variant="primary"
+                                >
+                                  Ver en {proveedor.nombre}
+                                </Button>
+                              )}
+                              {proveedor.precio && (
+                                <p className="proveedor-precio">
+                                  {proveedor.moneda || 'USD'} ${proveedor.precio}
+                                </p>
                               )}
                             </div>
-                          ))}
-                      </div>
-
-                      <div className="producto-proveedores-buttons">
-                        {producto.producto_proveedores
-                          .filter(pp => pp.proveedores && pp.disponible)
-                          .map((pp, idx) => (
-                            <Button
-                              key={idx}
-                              onClick={() => {
-                                if (pp.proveedores.sitio_web) {
-                                  window.open(pp.proveedores.sitio_web, '_blank', 'noopener,noreferrer');
-                                }
-                              }}
-                            >
-                              Saber más
-                            </Button>
                           ))}
                       </div>
                     </div>
@@ -164,8 +148,8 @@ const ProductoDetail = () => {
                 <div className="producto-categoria-imagen">
                   <ImageCarousel
                     images={
-                      producto.imagenes && Array.isArray(producto.imagenes) && producto.imagenes.length > 0
-                        ? producto.imagenes
+                      producto.imagenes_adicionales && Array.isArray(producto.imagenes_adicionales) && producto.imagenes_adicionales.length > 0
+                        ? producto.imagenes_adicionales
                         : producto.imagen_principal
                         ? [producto.imagen_principal]
                         : []
