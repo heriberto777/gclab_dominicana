@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Hero from '../components/organisms/Hero';
 import PageSection from '../components/templates/PageSection';
 import Button from '../components/atoms/Button';
+import ProveedoresCarousel from '../components/molecules/ProveedoresCarousel';
 import './MercadoDetail.css';
 
 const MercadoDetail = () => {
@@ -110,14 +111,6 @@ const MercadoDetail = () => {
 
   const mercadoData = mercados[sector] || mercados['industria-farmaceutica'];
 
-  const proveedores = [
-    'https://via.placeholder.com/150x80/ffffff/0066cc?text=Cytiva',
-    'https://via.placeholder.com/150x80/ffffff/0066cc?text=Cole-Parmer',
-    'https://via.placeholder.com/150x80/ffffff/0066cc?text=KRUSS',
-    'https://via.placeholder.com/150x80/ffffff/0066cc?text=LABCONCO',
-    'https://via.placeholder.com/150x80/ffffff/0066cc?text=Yamato'
-  ];
-
   return (
     <div className="mercado-detail">
       <Hero
@@ -149,13 +142,7 @@ const MercadoDetail = () => {
       </PageSection>
 
       <PageSection background="white">
-        <div className="proveedores-carousel">
-          {proveedores.map((proveedor, index) => (
-            <div key={index} className="proveedor-slide">
-              <img src={proveedor} alt={`Proveedor ${index + 1}`} />
-            </div>
-          ))}
-        </div>
+        <ProveedoresCarousel />
       </PageSection>
     </div>
   );

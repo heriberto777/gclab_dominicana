@@ -30,6 +30,7 @@ EXECUTE FUNCTION update_settings_updated_at();
 INSERT INTO settings (key, value, description) VALUES
   ('n8n_webhook_url', '', 'URL del webhook de n8n para el chatbot'),
   ('contact_webhook_url', '', 'URL del webhook de n8n para el formulario de contacto'),
+  ('chatbot_enabled', 'true', 'Activar o desactivar el chatbot en el sitio'),
   ('site_name', 'GC Lab', 'Nombre del sitio web'),
   ('site_email', 'info@gclab.com', 'Email de contacto del sitio'),
   ('site_phone', '809-000-0000', 'Teléfono de contacto del sitio')

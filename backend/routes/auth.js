@@ -31,10 +31,16 @@ router.post('/register', async (req, res) => {
     );
 
     const user = result.rows[0];
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '1h' }
+    );
+
+    const refreshToken = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
     );
 
     res.status(201).json({
@@ -43,7 +49,9 @@ router.post('/register', async (req, res) => {
         email: user.email,
         created_at: user.created_at
       },
-      token
+      accessToken,
+      refreshToken,
+      expiresIn: 3600
     });
   } catch (error) {
     console.error('Error en registro:', error);
@@ -72,10 +80,16 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '1h' }
+    );
+
+    const refreshToken = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
     );
 
     res.json({
@@ -84,7 +98,9 @@ router.post('/login', async (req, res) => {
         email: user.email,
         created_at: user.created_at
       },
-      token
+      accessToken,
+      refreshToken,
+      expiresIn: 3600
     });
   } catch (error) {
     console.error('Error en login:', error);
@@ -94,6 +110,42 @@ router.post('/login', async (req, res) => {
 
 router.post('/logout', authMiddleware, (req, res) => {
   res.json({ message: 'Sesión cerrada exitosamente' });
+});
+
+router.post('/refresh', async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(401).json({ error: 'Refresh token requerido' });
+  }
+
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+
+    const result = await pool.query(
+      'SELECT id, email, created_at FROM users WHERE id = $1',
+      [decoded.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    const user = result.rows[0];
+    const newAccessToken = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res.json({
+      accessToken: newAccessToken,
+      expiresIn: 3600
+    });
+  } catch (error) {
+    console.error('Error al refrescar token:', error);
+    res.status(401).json({ error: 'Token inválido o expirado' });
+  }
 });
 
 router.get('/me', authMiddleware, async (req, res) => {

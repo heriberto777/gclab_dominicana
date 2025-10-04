@@ -16,6 +16,7 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [webhookUrl, setWebhookUrl] = useState('');
   const [contactWebhookUrl, setContactWebhookUrl] = useState('');
+  const [chatbotEnabled, setChatbotEnabled] = useState(true);
   const [savingWebhook, setSavingWebhook] = useState(false);
 
   useEffect(() => {
@@ -48,6 +49,7 @@ const Admin = () => {
         setSettings(settingsMap);
         setWebhookUrl(settingsMap['n8n_webhook_url']?.value || '');
         setContactWebhookUrl(settingsMap['contact_webhook_url']?.value || '');
+        setChatbotEnabled(settingsMap['chatbot_enabled']?.value === 'true');
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -106,7 +108,8 @@ const Admin = () => {
     try {
       await Promise.all([
         apiClient.updateSetting('n8n_webhook_url', webhookUrl),
-        apiClient.updateSetting('contact_webhook_url', contactWebhookUrl)
+        apiClient.updateSetting('contact_webhook_url', contactWebhookUrl),
+        apiClient.updateSetting('chatbot_enabled', chatbotEnabled ? 'true' : 'false')
       ]);
       alert('Configuración guardada exitosamente');
     } catch (error) {
@@ -388,6 +391,20 @@ const Admin = () => {
                     value={contactWebhookUrl}
                     onChange={(e) => setContactWebhookUrl(e.target.value)}
                   />
+                </div>
+
+                <div className="form-group">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={chatbotEnabled}
+                      onChange={(e) => setChatbotEnabled(e.target.checked)}
+                    />
+                    <span>Activar Chatbot en el Sitio</span>
+                  </label>
+                  <p className="form-help-text">
+                    Cuando está activado, el chatbot aparecerá en la esquina inferior derecha del sitio web. Asegúrate de configurar la URL del webhook antes de activarlo.
+                  </p>
                 </div>
 
                 <div className="form-actions">

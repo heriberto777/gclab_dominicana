@@ -18,19 +18,38 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       const token = apiClient.getToken();
-      if (token) {
+      const refreshToken = apiClient.getRefreshToken();
+
+      if (token && refreshToken) {
         try {
           const { user: currentUser, error } = await apiClient.getUser();
           if (!error && currentUser) {
             setUser(currentUser);
           } else {
-            apiClient.clearToken();
-            setUser(null);
+            const refreshed = await apiClient.refreshToken();
+            if (refreshed) {
+              const { user: refreshedUser } = await apiClient.getUser();
+              setUser(refreshedUser);
+            } else {
+              apiClient.clearTokens();
+              setUser(null);
+            }
           }
         } catch (error) {
           console.error('Auth init error:', error);
-          apiClient.clearToken();
-          setUser(null);
+          try {
+            const refreshed = await apiClient.refreshToken();
+            if (refreshed) {
+              const { user: refreshedUser } = await apiClient.getUser();
+              setUser(refreshedUser);
+            } else {
+              apiClient.clearTokens();
+              setUser(null);
+            }
+          } catch (refreshError) {
+            apiClient.clearTokens();
+            setUser(null);
+          }
         }
       }
       setLoading(false);

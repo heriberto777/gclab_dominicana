@@ -1,0 +1,201 @@
+.proveedores-carousel {
+  width: 100%;
+  padding: 3rem 0;
+}
+
+.proveedores-carousel-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 2.5rem;
+  color: #1a1a1a;
+}
+
+.carousel-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 3rem;
+}
+
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-button:hover {
+  background: #0066cc;
+  color: white;
+  border-color: #0066cc;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+}
+
+.carousel-button-prev {
+  left: 0;
+}
+
+.carousel-button-next {
+  right: 0;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 1.5rem;
+  width: 100%;
+  overflow: hidden;
+}
+
+.carousel-slide {
+  flex: 1;
+  min-width: 0;
+}
+
+.proveedor-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.proveedor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: #0066cc;
+}
+
+.proveedor-logo {
+  max-width: 100%;
+  max-height: 80px;
+  object-fit: contain;
+  filter: grayscale(100%);
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.proveedor-card:hover .proveedor-logo {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+.proveedor-placeholder {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0066cc;
+  text-align: center;
+  padding: 0 0.5rem;
+}
+
+.carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+}
+
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.carousel-dot:hover {
+  border-color: #0066cc;
+}
+
+.carousel-dot.active {
+  background: #0066cc;
+  border-color: #0066cc;
+}
+
+@media (max-width: 1024px) {
+  .carousel-container {
+    padding: 0 2.5rem;
+  }
+
+  .carousel-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+  }
+
+  .proveedor-card {
+    height: 100px;
+  }
+
+  .proveedor-logo {
+    max-height: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .proveedores-carousel-title {
+    font-size: 1.5rem;
+  }
+
+  .carousel-container {
+    padding: 0 2rem;
+  }
+
+  .carousel-track {
+    gap: 1rem;
+  }
+
+  .proveedor-card {
+    height: 90px;
+    padding: 1rem;
+  }
+
+  .proveedor-logo {
+    max-height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-container {
+    padding: 0 1.5rem;
+  }
+
+  .carousel-button {
+    width: 36px;
+    height: 36px;
+    font-size: 1.25rem;
+  }
+
+  .proveedor-card {
+    height: 80px;
+    padding: 0.75rem;
+  }
+
+  .carousel-track {
+    gap: 0.75rem;
+  }
+}

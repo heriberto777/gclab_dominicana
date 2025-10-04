@@ -3,20 +3,63 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://10.0.10.98:3001/api';
 class ApiClient {
   constructor() {
     this.token = localStorage.getItem('auth_token');
+    this.refreshToken = localStorage.getItem('refresh_token');
   }
 
-  setToken(token) {
-    this.token = token;
-    localStorage.setItem('auth_token', token);
+  setToken(accessToken, refreshToken) {
+    this.token = accessToken;
+    this.refreshToken = refreshToken;
+    localStorage.setItem('auth_token', accessToken);
+    if (refreshToken) {
+      localStorage.setItem('refresh_token', refreshToken);
+    }
+  }
+
+  clearTokens() {
+    this.token = null;
+    this.refreshToken = null;
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('refresh_token');
   }
 
   clearToken() {
-    this.token = null;
-    localStorage.removeItem('auth_token');
+    this.clearTokens();
   }
 
   getToken() {
     return this.token;
+  }
+
+  getRefreshToken() {
+    return this.refreshToken;
+  }
+
+  async refreshAccessToken() {
+    if (!this.refreshToken) {
+      return false;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken: this.refreshToken }),
+      });
+
+      if (!response.ok) {
+        this.clearTokens();
+        return false;
+      }
+
+      const data = await response.json();
+      this.token = data.accessToken;
+      localStorage.setItem('auth_token', data.accessToken);
+      return true;
+    } catch (error) {
+      console.error('Token refresh error:', error);
+      this.clearTokens();
+      return false;
+    }
   }
 
   async request(endpoint, options = {}) {
@@ -31,6 +74,22 @@ class ApiClient {
         ...options,
         headers,
       });
+
+      if (response.status === 401 && this.refreshToken && !endpoint.includes('/auth/')) {
+        const refreshed = await this.refreshAccessToken();
+        if (refreshed) {
+          headers.Authorization = `Bearer ${this.token}`;
+          const retryResponse = await fetch(`${API_URL}${endpoint}`, {
+            ...options,
+            headers,
+          });
+          if (!retryResponse.ok) {
+            const errorData = await retryResponse.json().catch(() => ({}));
+            throw new Error(errorData.error || `HTTP error! status: ${retryResponse.status}`);
+          }
+          return retryResponse.json();
+        }
+      }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -49,7 +108,7 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
-    this.setToken(data.token);
+    this.setToken(data.accessToken, data.refreshToken);
     return { user: data.user, error: null };
   }
 
@@ -58,7 +117,7 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
-    this.setToken(data.token);
+    this.setToken(data.accessToken, data.refreshToken);
     return { user: data.user, error: null };
   }
 
@@ -68,9 +127,13 @@ class ApiClient {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      this.clearToken();
+      this.clearTokens();
     }
     return { error: null };
+  }
+
+  async refreshToken() {
+    return await this.refreshAccessToken();
   }
 
   async getUser() {
@@ -82,7 +145,7 @@ class ApiClient {
       const data = await this.request('/auth/me');
       return { user: data.user, error: null };
     } catch (error) {
-      this.clearToken();
+      this.clearTokens();
       return { user: null, error };
     }
   }
