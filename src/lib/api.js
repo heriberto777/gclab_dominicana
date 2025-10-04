@@ -326,6 +326,41 @@ class ApiClient {
     });
     return { data, error: null };
   }
+
+  async getIndustrias(activo = true) {
+    const data = await this.request(
+      `/industrias${activo !== false ? "?activo=true" : ""}`
+    );
+    return { data, error: null };
+  }
+
+  async getIndustria(id) {
+    const data = await this.request(`/industrias/${id}`);
+    return { data, error: null };
+  }
+
+  async createIndustria(industria) {
+    const data = await this.request("/industrias", {
+      method: "POST",
+      body: JSON.stringify(industria),
+    });
+    return { data, error: null };
+  }
+
+  async updateIndustria(id, industria) {
+    const data = await this.request(`/industrias/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(industria),
+    });
+    return { data, error: null };
+  }
+
+  async deleteIndustria(id) {
+    const data = await this.request(`/industrias/${id}`, {
+      method: "DELETE",
+    });
+    return { data, error: null };
+  }
 }
 
 export const apiClient = new ApiClient();

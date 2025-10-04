@@ -8,6 +8,7 @@ const categoriasRoutes = require('./routes/categorias');
 const proveedoresRoutes = require('./routes/proveedores');
 const settingsRoutes = require('./routes/settings');
 const socialMediaRoutes = require("./routes/socialMedia");
+const industriasRoutes = require("./routes/industrias");
 
 const app = express();
 
@@ -58,6 +59,7 @@ app.use('/api/categorias', categoriasRoutes);
 app.use('/api/proveedores', proveedoresRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use("/api/social-media", socialMediaRoutes);
+app.use("/api/industrias", industriasRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
