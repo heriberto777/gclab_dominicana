@@ -19,6 +19,7 @@ const Admin = () => {
   const [chatbotEnabled, setChatbotEnabled] = useState(true);
   const [savingWebhook, setSavingWebhook] = useState(false);
   const [socialMedia, setSocialMedia] = useState([]);
+  const [industrias, setIndustrias] = useState([]);
 
   useEffect(() => {
     if (!user) {
@@ -39,8 +40,10 @@ const Admin = () => {
       ]);
 
       const socialMediaRes = await apiClient.getSocialMedia(false);
-      if (socialMediaRes.data) setSocialMedia(socialMediaRes.data);
+      const industriasRes = await apiClient.getIndustrias(false);
 
+      if (industriasRes.data) setIndustrias(industriasRes.data);
+      if (socialMediaRes.data) setSocialMedia(socialMediaRes.data);
       if (productosRes.data) setProductos(productosRes.data);
       if (categoriasRes.data) setCategorias(categoriasRes.data);
       if (proveedoresRes.data) setProveedores(proveedoresRes.data);
@@ -74,6 +77,7 @@ const Admin = () => {
         categorias: apiClient.updateCategoria,
         proveedores: apiClient.updateProveedor,
         social_media: apiClient.updateSocialMedia,
+        industrias: apiClient.updateIndustria,
       };
 
       const updateMethod = updateMethods[table];
@@ -96,6 +100,7 @@ const Admin = () => {
         categorias: apiClient.deleteCategoria,
         proveedores: apiClient.deleteProveedor,
         social_media: apiClient.deleteSocialMedia,
+        industrias: apiClient.deleteIndustria,
       };
 
       const deleteMethod = deleteMethods[table];
@@ -181,6 +186,14 @@ const Admin = () => {
             onClick={() => setActiveTab("redes")}
           >
             Redes Sociales ({socialMedia.length})
+          </button>
+          <button
+            className={`admin-tab ${
+              activeTab === "industrias" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("industrias")}
+          >
+            Industrias ({industrias.length})
           </button>
         </div>
 
@@ -621,6 +634,104 @@ const Admin = () => {
                               className="btn-sm btn-delete"
                               onClick={() =>
                                 handleDelete("social_media", social.id)
+                              }
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "industrias" && (
+            <div className="admin-section">
+              <div className="section-header">
+                <h2>Gestión de Industrias</h2>
+                <Button onClick={() => navigate("/admin/industrias/nueva")}>
+                  Nueva Industria
+                </Button>
+              </div>
+
+              <div className="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Slug</th>
+                      <th>Orden</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {industrias.map((industria) => (
+                      <tr key={industria.id}>
+                        <td>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "12px",
+                            }}
+                          >
+                            {industria.icono_url && (
+                              <img
+                                src={industria.icono_url}
+                                alt={industria.nombre}
+                                style={{
+                                  width: "32px",
+                                  height: "32px",
+                                  objectFit: "contain",
+                                }}
+                              />
+                            )}
+                            {industria.nombre}
+                          </div>
+                        </td>
+                        <td>
+                          <code>/mercado/{industria.slug}</code>
+                        </td>
+                        <td>{industria.orden}</td>
+                        <td>
+                          <span
+                            className={`status-badge ${
+                              industria.activo ? "active" : "inactive"
+                            }`}
+                          >
+                            {industria.activo ? "Activo" : "Inactivo"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="action-buttons">
+                            <button
+                              className="btn-sm btn-edit"
+                              onClick={() =>
+                                navigate(`/admin/industrias/${industria.id}`)
+                              }
+                            >
+                              Editar
+                            </button>
+                            <button
+                              className="btn-sm btn-toggle"
+                              onClick={() =>
+                                handleToggleActivo(
+                                  "industrias",
+                                  industria.id,
+                                  industria.activo
+                                )
+                              }
+                            >
+                              {industria.activo ? "Desactivar" : "Activar"}
+                            </button>
+                            <button
+                              className="btn-sm btn-delete"
+                              onClick={() =>
+                                handleDelete("industrias", industria.id)
                               }
                             >
                               Eliminar
