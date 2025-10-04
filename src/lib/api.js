@@ -2,24 +2,24 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://10.0.10.98:3001/api';
 
 class ApiClient {
   constructor() {
-    this.token = localStorage.getItem('auth_token');
-    this.refreshToken = localStorage.getItem('refresh_token');
+    this.token = localStorage.getItem("auth_token");
+    this.refreshToken = localStorage.getItem("refresh_token");
   }
 
   setToken(accessToken, refreshToken) {
     this.token = accessToken;
     this.refreshToken = refreshToken;
-    localStorage.setItem('auth_token', accessToken);
+    localStorage.setItem("auth_token", accessToken);
     if (refreshToken) {
-      localStorage.setItem('refresh_token', refreshToken);
+      localStorage.setItem("refresh_token", refreshToken);
     }
   }
 
   clearTokens() {
     this.token = null;
     this.refreshToken = null;
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('refresh_token');
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("refresh_token");
   }
 
   clearToken() {
@@ -41,8 +41,8 @@ class ApiClient {
 
     try {
       const response = await fetch(`${API_URL}/auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken: this.refreshToken }),
       });
 
@@ -53,10 +53,10 @@ class ApiClient {
 
       const data = await response.json();
       this.token = data.accessToken;
-      localStorage.setItem('auth_token', data.accessToken);
+      localStorage.setItem("auth_token", data.accessToken);
       return true;
     } catch (error) {
-      console.error('Token refresh error:', error);
+      console.error("Token refresh error:", error);
       this.clearTokens();
       return false;
     }
@@ -64,7 +64,7 @@ class ApiClient {
 
   async request(endpoint, options = {}) {
     const headers = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...(this.token && { Authorization: `Bearer ${this.token}` }),
       ...options.headers,
     };
@@ -75,7 +75,11 @@ class ApiClient {
         headers,
       });
 
-      if (response.status === 401 && this.refreshToken && !endpoint.includes('/auth/')) {
+      if (
+        response.status === 401 &&
+        this.refreshToken &&
+        !endpoint.includes("/auth/")
+      ) {
         const refreshed = await this.refreshAccessToken();
         if (refreshed) {
           headers.Authorization = `Bearer ${this.token}`;
@@ -85,7 +89,9 @@ class ApiClient {
           });
           if (!retryResponse.ok) {
             const errorData = await retryResponse.json().catch(() => ({}));
-            throw new Error(errorData.error || `HTTP error! status: ${retryResponse.status}`);
+            throw new Error(
+              errorData.error || `HTTP error! status: ${retryResponse.status}`
+            );
           }
           return retryResponse.json();
         }
@@ -93,19 +99,21 @@ class ApiClient {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.error || `HTTP error! status: ${response.status}`
+        );
       }
 
       return response.json();
     } catch (error) {
-      console.error('API Request Error:', error);
+      console.error("API Request Error:", error);
       throw error;
     }
   }
 
   async signUp(email, password) {
-    const data = await this.request('/auth/register', {
-      method: 'POST',
+    const data = await this.request("/auth/register", {
+      method: "POST",
       body: JSON.stringify({ email, password }),
     });
     this.setToken(data.accessToken, data.refreshToken);
@@ -113,8 +121,8 @@ class ApiClient {
   }
 
   async signIn(email, password) {
-    const data = await this.request('/auth/login', {
-      method: 'POST',
+    const data = await this.request("/auth/login", {
+      method: "POST",
       body: JSON.stringify({ email, password }),
     });
     this.setToken(data.accessToken, data.refreshToken);
@@ -123,9 +131,9 @@ class ApiClient {
 
   async signOut() {
     try {
-      await this.request('/auth/logout', { method: 'POST' });
+      await this.request("/auth/logout", { method: "POST" });
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
       this.clearTokens();
     }
@@ -142,7 +150,7 @@ class ApiClient {
     }
 
     try {
-      const data = await this.request('/auth/me');
+      const data = await this.request("/auth/me");
       return { user: data.user, error: null };
     } catch (error) {
       this.clearTokens();
@@ -152,12 +160,14 @@ class ApiClient {
 
   async getProductos(filters = {}) {
     const params = new URLSearchParams();
-    if (filters.categoria) params.append('categoria', filters.categoria);
-    if (filters.destacado) params.append('destacado', 'true');
-    if (filters.activo !== undefined) params.append('activo', filters.activo);
+    if (filters.categoria) params.append("categoria", filters.categoria);
+    if (filters.destacado) params.append("destacado", "true");
+    if (filters.activo !== undefined) params.append("activo", filters.activo);
 
     const queryString = params.toString();
-    const data = await this.request(`/productos${queryString ? `?${queryString}` : ''}`);
+    const data = await this.request(
+      `/productos${queryString ? `?${queryString}` : ""}`
+    );
     return { data, error: null };
   }
 
@@ -167,8 +177,8 @@ class ApiClient {
   }
 
   async createProducto(producto) {
-    const data = await this.request('/productos', {
-      method: 'POST',
+    const data = await this.request("/productos", {
+      method: "POST",
       body: JSON.stringify(producto),
     });
     return { data, error: null };
@@ -176,7 +186,7 @@ class ApiClient {
 
   async updateProducto(id, producto) {
     const data = await this.request(`/productos/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(producto),
     });
     return { data, error: null };
@@ -184,13 +194,15 @@ class ApiClient {
 
   async deleteProducto(id) {
     const data = await this.request(`/productos/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     return { data, error: null };
   }
 
   async getCategorias(activo = true) {
-    const data = await this.request(`/categorias${activo !== false ? '?activo=true' : ''}`);
+    const data = await this.request(
+      `/categorias${activo !== false ? "?activo=true" : ""}`
+    );
     return { data, error: null };
   }
 
@@ -205,8 +217,8 @@ class ApiClient {
   }
 
   async createCategoria(categoria) {
-    const data = await this.request('/categorias', {
-      method: 'POST',
+    const data = await this.request("/categorias", {
+      method: "POST",
       body: JSON.stringify(categoria),
     });
     return { data, error: null };
@@ -214,7 +226,7 @@ class ApiClient {
 
   async updateCategoria(id, categoria) {
     const data = await this.request(`/categorias/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(categoria),
     });
     return { data, error: null };
@@ -222,13 +234,15 @@ class ApiClient {
 
   async deleteCategoria(id) {
     const data = await this.request(`/categorias/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     return { data, error: null };
   }
 
   async getProveedores(activo = true) {
-    const data = await this.request(`/proveedores${activo !== false ? '?activo=true' : ''}`);
+    const data = await this.request(
+      `/proveedores${activo !== false ? "?activo=true" : ""}`
+    );
     return { data, error: null };
   }
 
@@ -238,8 +252,8 @@ class ApiClient {
   }
 
   async createProveedor(proveedor) {
-    const data = await this.request('/proveedores', {
-      method: 'POST',
+    const data = await this.request("/proveedores", {
+      method: "POST",
       body: JSON.stringify(proveedor),
     });
     return { data, error: null };
@@ -247,7 +261,7 @@ class ApiClient {
 
   async updateProveedor(id, proveedor) {
     const data = await this.request(`/proveedores/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(proveedor),
     });
     return { data, error: null };
@@ -255,13 +269,13 @@ class ApiClient {
 
   async deleteProveedor(id) {
     const data = await this.request(`/proveedores/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     return { data, error: null };
   }
 
   async getSettings() {
-    const data = await this.request('/settings');
+    const data = await this.request("/settings");
     return { data, error: null };
   }
 
@@ -272,8 +286,43 @@ class ApiClient {
 
   async updateSetting(key, value) {
     const data = await this.request(`/settings/${key}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify({ value }),
+    });
+    return { data, error: null };
+  }
+
+  async getSocialMedia(activo = true) {
+    const data = await this.request(
+      `/social-media${activo !== false ? "?activo=true" : ""}`
+    );
+    return { data, error: null };
+  }
+
+  async getSocialMediaItem(id) {
+    const data = await this.request(`/social-media/${id}`);
+    return { data, error: null };
+  }
+
+  async createSocialMedia(socialMedia) {
+    const data = await this.request("/social-media", {
+      method: "POST",
+      body: JSON.stringify(socialMedia),
+    });
+    return { data, error: null };
+  }
+
+  async updateSocialMedia(id, socialMedia) {
+    const data = await this.request(`/social-media/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(socialMedia),
+    });
+    return { data, error: null };
+  }
+
+  async deleteSocialMedia(id) {
+    const data = await this.request(`/social-media/${id}`, {
+      method: "DELETE",
     });
     return { data, error: null };
   }

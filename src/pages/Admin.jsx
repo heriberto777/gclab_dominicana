@@ -18,6 +18,7 @@ const Admin = () => {
   const [contactWebhookUrl, setContactWebhookUrl] = useState('');
   const [chatbotEnabled, setChatbotEnabled] = useState(true);
   const [savingWebhook, setSavingWebhook] = useState(false);
+  const [socialMedia, setSocialMedia] = useState([]);
 
   useEffect(() => {
     if (!user) {
@@ -36,6 +37,9 @@ const Admin = () => {
         apiClient.getProveedores(false),
         apiClient.getSettings(),
       ]);
+
+      const socialMediaRes = await apiClient.getSocialMedia(false);
+      if (socialMediaRes.data) setSocialMedia(socialMediaRes.data);
 
       if (productosRes.data) setProductos(productosRes.data);
       if (categoriasRes.data) setCategorias(categoriasRes.data);
@@ -69,6 +73,7 @@ const Admin = () => {
         productos: apiClient.updateProducto,
         categorias: apiClient.updateCategoria,
         proveedores: apiClient.updateProveedor,
+        social_media: apiClient.updateSocialMedia,
       };
 
       const updateMethod = updateMethods[table];
@@ -90,6 +95,7 @@ const Admin = () => {
         productos: apiClient.deleteProducto,
         categorias: apiClient.deleteCategoria,
         proveedores: apiClient.deleteProveedor,
+        social_media: apiClient.deleteSocialMedia,
       };
 
       const deleteMethod = deleteMethods[table];
@@ -141,37 +147,49 @@ const Admin = () => {
       <div className="admin-container">
         <div className="admin-tabs">
           <button
-            className={`admin-tab ${activeTab === 'productos' ? 'active' : ''}`}
-            onClick={() => setActiveTab('productos')}
+            className={`admin-tab ${activeTab === "productos" ? "active" : ""}`}
+            onClick={() => setActiveTab("productos")}
           >
             Productos ({productos.length})
           </button>
           <button
-            className={`admin-tab ${activeTab === 'categorias' ? 'active' : ''}`}
-            onClick={() => setActiveTab('categorias')}
+            className={`admin-tab ${
+              activeTab === "categorias" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("categorias")}
           >
             Categorías ({categorias.length})
           </button>
           <button
-            className={`admin-tab ${activeTab === 'proveedores' ? 'active' : ''}`}
-            onClick={() => setActiveTab('proveedores')}
+            className={`admin-tab ${
+              activeTab === "proveedores" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("proveedores")}
           >
             Proveedores ({proveedores.length})
           </button>
           <button
-            className={`admin-tab ${activeTab === 'configuracion' ? 'active' : ''}`}
-            onClick={() => setActiveTab('configuracion')}
+            className={`admin-tab ${
+              activeTab === "configuracion" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("configuracion")}
           >
             Configuración
+          </button>
+          <button
+            className={`admin-tab ${activeTab === "redes" ? "active" : ""}`}
+            onClick={() => setActiveTab("redes")}
+          >
+            Redes Sociales ({socialMedia.length})
           </button>
         </div>
 
         <div className="admin-content">
-          {activeTab === 'productos' && (
+          {activeTab === "productos" && (
             <div className="admin-section">
               <div className="section-header">
                 <h2>Gestión de Productos</h2>
-                <Button onClick={() => navigate('/admin/productos/nuevo')}>
+                <Button onClick={() => navigate("/admin/productos/nuevo")}>
                   Nuevo Producto
                 </Button>
               </div>
@@ -191,34 +209,54 @@ const Admin = () => {
                     {productos.map((producto) => (
                       <tr key={producto.id}>
                         <td>{producto.nombre}</td>
-                        <td>{producto.categorias?.nombre || 'Sin categoría'}</td>
                         <td>
-                          <span className={`status-badge ${producto.activo ? 'active' : 'inactive'}`}>
-                            {producto.activo ? 'Activo' : 'Inactivo'}
+                          {producto.categorias?.nombre || "Sin categoría"}
+                        </td>
+                        <td>
+                          <span
+                            className={`status-badge ${
+                              producto.activo ? "active" : "inactive"
+                            }`}
+                          >
+                            {producto.activo ? "Activo" : "Inactivo"}
                           </span>
                         </td>
                         <td>
-                          <span className={`status-badge ${producto.destacado ? 'featured' : ''}`}>
-                            {producto.destacado ? 'Sí' : 'No'}
+                          <span
+                            className={`status-badge ${
+                              producto.destacado ? "featured" : ""
+                            }`}
+                          >
+                            {producto.destacado ? "Sí" : "No"}
                           </span>
                         </td>
                         <td>
                           <div className="action-buttons">
                             <button
                               className="btn-sm btn-edit"
-                              onClick={() => navigate(`/admin/productos/${producto.id}`)}
+                              onClick={() =>
+                                navigate(`/admin/productos/${producto.id}`)
+                              }
                             >
                               Editar
                             </button>
                             <button
                               className="btn-sm btn-toggle"
-                              onClick={() => handleToggleActivo('productos', producto.id, producto.activo)}
+                              onClick={() =>
+                                handleToggleActivo(
+                                  "productos",
+                                  producto.id,
+                                  producto.activo
+                                )
+                              }
                             >
-                              {producto.activo ? 'Desactivar' : 'Activar'}
+                              {producto.activo ? "Desactivar" : "Activar"}
                             </button>
                             <button
                               className="btn-sm btn-delete"
-                              onClick={() => handleDelete('productos', producto.id)}
+                              onClick={() =>
+                                handleDelete("productos", producto.id)
+                              }
                             >
                               Eliminar
                             </button>
@@ -232,11 +270,11 @@ const Admin = () => {
             </div>
           )}
 
-          {activeTab === 'categorias' && (
+          {activeTab === "categorias" && (
             <div className="admin-section">
               <div className="section-header">
                 <h2>Gestión de Categorías</h2>
-                <Button onClick={() => navigate('/admin/categorias/nueva')}>
+                <Button onClick={() => navigate("/admin/categorias/nueva")}>
                   Nueva Categoría
                 </Button>
               </div>
@@ -256,26 +294,40 @@ const Admin = () => {
                     {categorias.map((categoria) => (
                       <tr key={categoria.id}>
                         <td>{categoria.nombre}</td>
-                        <td><code>{categoria.slug}</code></td>
+                        <td>
+                          <code>{categoria.slug}</code>
+                        </td>
                         <td>{categoria.orden}</td>
                         <td>
-                          <span className={`status-badge ${categoria.activo ? 'active' : 'inactive'}`}>
-                            {categoria.activo ? 'Activo' : 'Inactivo'}
+                          <span
+                            className={`status-badge ${
+                              categoria.activo ? "active" : "inactive"
+                            }`}
+                          >
+                            {categoria.activo ? "Activo" : "Inactivo"}
                           </span>
                         </td>
                         <td>
                           <div className="action-buttons">
                             <button
                               className="btn-sm btn-edit"
-                              onClick={() => navigate(`/admin/categorias/${categoria.id}`)}
+                              onClick={() =>
+                                navigate(`/admin/categorias/${categoria.id}`)
+                              }
                             >
                               Editar
                             </button>
                             <button
                               className="btn-sm btn-toggle"
-                              onClick={() => handleToggleActivo('categorias', categoria.id, categoria.activo)}
+                              onClick={() =>
+                                handleToggleActivo(
+                                  "categorias",
+                                  categoria.id,
+                                  categoria.activo
+                                )
+                              }
                             >
-                              {categoria.activo ? 'Desactivar' : 'Activar'}
+                              {categoria.activo ? "Desactivar" : "Activar"}
                             </button>
                           </div>
                         </td>
@@ -287,11 +339,11 @@ const Admin = () => {
             </div>
           )}
 
-          {activeTab === 'proveedores' && (
+          {activeTab === "proveedores" && (
             <div className="admin-section">
               <div className="section-header">
                 <h2>Gestión de Proveedores</h2>
-                <Button onClick={() => navigate('/admin/proveedores/nuevo')}>
+                <Button onClick={() => navigate("/admin/proveedores/nuevo")}>
                   Nuevo Proveedor
                 </Button>
               </div>
@@ -312,33 +364,51 @@ const Admin = () => {
                         <td>{proveedor.nombre}</td>
                         <td>
                           {proveedor.sitio_web && (
-                            <a href={proveedor.sitio_web} target="_blank" rel="noopener noreferrer">
+                            <a
+                              href={proveedor.sitio_web}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
                               {proveedor.sitio_web}
                             </a>
                           )}
                         </td>
                         <td>
-                          <span className={`status-badge ${proveedor.activo ? 'active' : 'inactive'}`}>
-                            {proveedor.activo ? 'Activo' : 'Inactivo'}
+                          <span
+                            className={`status-badge ${
+                              proveedor.activo ? "active" : "inactive"
+                            }`}
+                          >
+                            {proveedor.activo ? "Activo" : "Inactivo"}
                           </span>
                         </td>
                         <td>
                           <div className="action-buttons">
                             <button
                               className="btn-sm btn-edit"
-                              onClick={() => navigate(`/admin/proveedores/${proveedor.id}`)}
+                              onClick={() =>
+                                navigate(`/admin/proveedores/${proveedor.id}`)
+                              }
                             >
                               Editar
                             </button>
                             <button
                               className="btn-sm btn-toggle"
-                              onClick={() => handleToggleActivo('proveedores', proveedor.id, proveedor.activo)}
+                              onClick={() =>
+                                handleToggleActivo(
+                                  "proveedores",
+                                  proveedor.id,
+                                  proveedor.activo
+                                )
+                              }
                             >
-                              {proveedor.activo ? 'Desactivar' : 'Activar'}
+                              {proveedor.activo ? "Desactivar" : "Activar"}
                             </button>
                             <button
                               className="btn-sm btn-delete"
-                              onClick={() => handleDelete('proveedores', proveedor.id)}
+                              onClick={() =>
+                                handleDelete("proveedores", proveedor.id)
+                              }
                             >
                               Eliminar
                             </button>
@@ -352,7 +422,7 @@ const Admin = () => {
             </div>
           )}
 
-          {activeTab === 'configuracion' && (
+          {activeTab === "configuracion" && (
             <div className="admin-section">
               <div className="section-header">
                 <h2>Configuración del Sistema</h2>
@@ -364,7 +434,9 @@ const Admin = () => {
                     URL del Webhook de n8n para Chatbot
                   </label>
                   <p className="form-help-text">
-                    Esta URL se utilizará para conectar el chatbot con n8n. Asegúrate de que el webhook esté activo en tu instancia de n8n.
+                    Esta URL se utilizará para conectar el chatbot con n8n.
+                    Asegúrate de que el webhook esté activo en tu instancia de
+                    n8n.
                   </p>
                   <input
                     id="webhook-url"
@@ -381,7 +453,9 @@ const Admin = () => {
                     URL del Webhook de n8n para Formulario de Contacto
                   </label>
                   <p className="form-help-text">
-                    Esta URL se utilizará para enviar los datos del formulario de contacto a n8n y redirigirlos al departamento correspondiente.
+                    Esta URL se utilizará para enviar los datos del formulario
+                    de contacto a n8n y redirigirlos al departamento
+                    correspondiente.
                   </p>
                   <input
                     id="contact-webhook-url"
@@ -403,16 +477,15 @@ const Admin = () => {
                     <span>Activar Chatbot en el Sitio</span>
                   </label>
                   <p className="form-help-text">
-                    Cuando está activado, el chatbot aparecerá en la esquina inferior derecha del sitio web. Asegúrate de configurar la URL del webhook antes de activarlo.
+                    Cuando está activado, el chatbot aparecerá en la esquina
+                    inferior derecha del sitio web. Asegúrate de configurar la
+                    URL del webhook antes de activarlo.
                   </p>
                 </div>
 
                 <div className="form-actions">
-                  <Button
-                    onClick={handleSaveWebhook}
-                    disabled={savingWebhook}
-                  >
-                    {savingWebhook ? 'Guardando...' : 'Guardar Configuración'}
+                  <Button onClick={handleSaveWebhook} disabled={savingWebhook}>
+                    {savingWebhook ? "Guardando..." : "Guardar Configuración"}
                   </Button>
                 </div>
 
@@ -425,20 +498,139 @@ const Admin = () => {
                     <li>Agrega un nodo "Webhook" al inicio</li>
                     <li>Configura el webhook con método POST</li>
                     <li>Copia la URL del webhook y pégala arriba</li>
-                    <li>Agrega los nodos necesarios para procesar el mensaje</li>
-                    <li>Asegúrate de que la respuesta tenga el formato: <code>{`{ "response": "texto de respuesta" }`}</code></li>
+                    <li>
+                      Agrega los nodos necesarios para procesar el mensaje
+                    </li>
+                    <li>
+                      Asegúrate de que la respuesta tenga el formato:{" "}
+                      <code>{`{ "response": "texto de respuesta" }`}</code>
+                    </li>
                   </ol>
 
                   <h4>Webhook del Formulario de Contacto:</h4>
                   <ol>
                     <li>Crea otro workflow en n8n</li>
                     <li>Agrega un nodo "Webhook" al inicio</li>
-                    <li>El webhook recibirá: nombre, email, departamento, mensaje</li>
-                    <li>Usa un nodo "Switch" para enrutar según el departamento</li>
-                    <li>Conecta cada rama a diferentes nodos de email o notificación</li>
-                    <li>La respuesta debe ser: <code>{`{ "success": true, "message": "Mensaje enviado" }`}</code></li>
+                    <li>
+                      El webhook recibirá: nombre, email, departamento, mensaje
+                    </li>
+                    <li>
+                      Usa un nodo "Switch" para enrutar según el departamento
+                    </li>
+                    <li>
+                      Conecta cada rama a diferentes nodos de email o
+                      notificación
+                    </li>
+                    <li>
+                      La respuesta debe ser:{" "}
+                      <code>{`{ "success": true, "message": "Mensaje enviado" }`}</code>
+                    </li>
                   </ol>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "redes" && (
+            <div className="admin-section">
+              <div className="section-header">
+                <h2>Gestión de Redes Sociales</h2>
+                <Button onClick={() => navigate("/admin/redes-sociales/nueva")}>
+                  Nueva Red Social
+                </Button>
+              </div>
+
+              <div className="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>URL</th>
+                      <th>Orden</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {socialMedia.map((social) => (
+                      <tr key={social.id}>
+                        <td>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "12px",
+                            }}
+                          >
+                            {social.logo_url && (
+                              <img
+                                src={social.logo_url}
+                                alt={social.nombre}
+                                style={{
+                                  width: "24px",
+                                  height: "24px",
+                                  objectFit: "contain",
+                                }}
+                              />
+                            )}
+                            {social.nombre}
+                          </div>
+                        </td>
+                        <td>
+                          <a
+                            href={social.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {social.url}
+                          </a>
+                        </td>
+                        <td>{social.orden}</td>
+                        <td>
+                          <span
+                            className={`status-badge ${
+                              social.activo ? "active" : "inactive"
+                            }`}
+                          >
+                            {social.activo ? "Activo" : "Inactivo"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="action-buttons">
+                            <button
+                              className="btn-sm btn-edit"
+                              onClick={() =>
+                                navigate(`/admin/redes-sociales/${social.id}`)
+                              }
+                            >
+                              Editar
+                            </button>
+                            <button
+                              className="btn-sm btn-toggle"
+                              onClick={() =>
+                                handleToggleActivo(
+                                  "social_media",
+                                  social.id,
+                                  social.activo
+                                )
+                              }
+                            >
+                              {social.activo ? "Desactivar" : "Activar"}
+                            </button>
+                            <button
+                              className="btn-sm btn-delete"
+                              onClick={() =>
+                                handleDelete("social_media", social.id)
+                              }
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}

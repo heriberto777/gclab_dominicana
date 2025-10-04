@@ -13,6 +13,7 @@ import Admin from './pages/Admin';
 import ProductoForm from './pages/ProductoForm';
 import CategoriaForm from './pages/CategoriaForm';
 import ProveedorForm from './pages/ProveedorForm';
+import SocialMediaForm from "./pages/SocialMediaForm";
 
 function App() {
   return (
@@ -36,6 +37,14 @@ function App() {
           <Route path="/admin/categorias/:id" element={<CategoriaForm />} />
           <Route path="/admin/proveedores/nuevo" element={<ProveedorForm />} />
           <Route path="/admin/proveedores/:id" element={<ProveedorForm />} />
+          <Route
+            path="/admin/redes-sociales/nueva"
+            element={<SocialMediaForm />}
+          />
+          <Route
+            path="/admin/redes-sociales/:id"
+            element={<SocialMediaForm />}
+          />
         </Routes>
       </Router>
     </AuthProvider>
