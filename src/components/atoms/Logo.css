@@ -1,11 +1,155 @@
-.logo {
+/* src/components/atomos/Logo/Logo.css */
+
+/* ==================== ESTILOS BASE ==================== */
+
+.logo-container {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.logo-container:hover {
+  opacity: 0.9;
+}
+
+.logo-wrapper {
   display: flex;
   align-items: center;
 }
 
-.logo-text {
-  font-size: 28px;
+/* ==================== IMÁGENES DE LOGO ==================== */
+
+.logo-image {
+  width: auto;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.logo-container:hover .logo-image {
+  transform: scale(1.03);
+}
+
+/* Estilos específicos para logo de navbar */
+.logo-image-navbar {
+  /* Ajustes específicos si son necesarios */
+}
+
+/* Estilos específicos para logo de footer */
+.logo-image-footer {
+  /* Puede tener filtros o ajustes específicos */
+  filter: brightness(0.95);
+}
+
+/* ==================== FALLBACK DE TEXTO ==================== */
+
+.logo-text-fallback {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+}
+
+.logo-text-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  line-height: 1;
+}
+
+/* Texto principal "GC LAB" */
+.logo-main-text {
   font-weight: 700;
-  color: #0066cc;
-  letter-spacing: -0.5px;
+  color: #5a5a5a;
+  letter-spacing: 0.5px;
+  display: block;
+  transition: color 0.2s ease;
+}
+
+/* Subtexto "DOMINICANA" */
+.logo-subtext {
+  font-weight: 600;
+  color: #008B8B;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: block;
+  transition: color 0.2s ease;
+}
+
+/* ==================== VARIANTES DE TIPO ==================== */
+
+/* Fallback específico para navbar (colores por defecto) */
+.logo-text-navbar .logo-main-text {
+  color: #5a5a5a;
+}
+
+.logo-text-navbar .logo-subtext {
+  color: #008B8B;
+}
+
+/* Fallback específico para footer (colores claros) */
+.logo-text-footer .logo-main-text {
+  color: #ffffff;
+}
+
+.logo-text-footer .logo-subtext {
+  color: #4DD0E1;
+}
+
+/* ==================== VARIANTE WHITE (fondo oscuro) ==================== */
+
+.logo-white .logo-main-text {
+  color: #ffffff;
+}
+
+.logo-white .logo-subtext {
+  color: #4DD0E1;
+}
+
+/* ==================== HOVER EFFECTS ==================== */
+
+/* Hover para navbar */
+.logo-type-navbar:hover .logo-main-text {
+  color: #3a3a3a;
+}
+
+.logo-type-navbar:hover .logo-subtext {
+  color: #006d6d;
+}
+
+/* Hover para footer */
+.logo-type-footer:hover .logo-main-text {
+  color: #f0f0f0;
+}
+
+.logo-type-footer:hover .logo-subtext {
+  color: #80DEEA;
+}
+
+/* Hover para variante white */
+.logo-white:hover .logo-main-text {
+  color: #f0f0f0;
+}
+
+.logo-white:hover .logo-subtext {
+  color: #80DEEA;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+  .logo-text-fallback {
+    padding: 3px 6px;
+  }
+
+  .logo-text-group {
+    gap: 1px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-wrapper {
+    gap: 6px;
+  }
 }

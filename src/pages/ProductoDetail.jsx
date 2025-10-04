@@ -131,7 +131,7 @@ const ProductoDetail = () => {
                             </a>
                           ))}
                       </div>
-                      <div className="proveedores-buttons-row">
+                      {/* <div className="proveedores-buttons-row">
                         {producto.proveedores
                           .filter(prov => prov.disponible !== false)
                           .map((proveedor, idx) => (
@@ -143,7 +143,7 @@ const ProductoDetail = () => {
                               Saber más
                             </Button>
                           ))}
-                      </div>
+                      </div> */}
                     </div>
                   )}
                 </div>

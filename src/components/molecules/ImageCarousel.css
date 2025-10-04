@@ -13,8 +13,8 @@
   min-height: 300px;
   overflow: hidden;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  background: #f7fafc;
+  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #ffffff; */
 }
 
 .carousel-slide {
@@ -65,8 +65,9 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 700;
+  text-align: center;
   color: #0066cc;
   cursor: pointer;
   display: flex;

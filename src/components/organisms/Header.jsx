@@ -45,13 +45,17 @@ const Header = () => {
     <header className="header">
       <div className="header-container">
         <Link to="/">
-          <Logo />
+          <Logo type="navbar" size="medium" />
         </Link>
 
-        <nav className={`nav ${mobileMenuOpen ? 'nav-open' : ''}`}>
+        <nav className={`nav ${mobileMenuOpen ? "nav-open" : ""}`}>
           <NavItem to="/">Inicio</NavItem>
           <NavItem to="/quienes-somos">Quienes Somos</NavItem>
-          <NavItem to="/mercado/industria-farmaceutica" hasDropdown dropdownItems={mercadoItems}>
+          <NavItem
+            to="/mercado/industria-farmaceutica"
+            hasDropdown
+            dropdownItems={mercadoItems}
+          >
             Mercado
           </NavItem>
           <NavItem to="/productos" hasDropdown dropdownItems={productosItems}>
@@ -65,7 +69,7 @@ const Header = () => {
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
         >
-          <Icon name={mobileMenuOpen ? 'close' : 'menu'} size={28} />
+          <Icon name={mobileMenuOpen ? "close" : "menu"} size={28} />
         </button>
       </div>
     </header>

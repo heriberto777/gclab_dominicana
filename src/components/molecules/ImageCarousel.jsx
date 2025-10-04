@@ -40,15 +40,15 @@ const ImageCarousel = ({ images = [], interval = 5000, alt = 'Product image' }) 
     );
   }
 
-  if (validImages.length === 1) {
-    return (
-      <div className="image-carousel">
-        <div className="carousel-slide active">
-          <img src={validImages[0]} alt={alt} />
-        </div>
-      </div>
-    );
-  }
+  // if (validImages.length === 1) {
+  //   return (
+  //     <div className="image-carousel">
+  //       <div className="carousel-slide active">
+  //         <img src={validImages[0]} alt={alt} />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="image-carousel">
