@@ -52,28 +52,34 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pool.query(
-      `SELECT p.*, c.nombre as categoria_nombre, c.slug as categoria_slug, pr.nombre as proveedor_nombre
+
+    const productoResult = await pool.query(
+      `SELECT p.*, c.nombre as categoria_nombre, c.slug as categoria_slug
        FROM productos p
        LEFT JOIN categorias c ON p.categoria_id = c.id
-       LEFT JOIN proveedores pr ON p.proveedor_id = pr.id
        WHERE p.id = $1`,
       [id]
     );
 
-    if (result.rows.length === 0) {
+    if (productoResult.rows.length === 0) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
 
+    const proveedoresResult = await pool.query(
+      `SELECT pr.id, pr.nombre, pr.logo_url, pr.sitio_web, pp.precio, pp.moneda, pp.codigo_producto, pp.disponible
+       FROM producto_proveedores pp
+       JOIN proveedores pr ON pp.proveedor_id = pr.id
+       WHERE pp.producto_id = $1 AND pr.activo = true`,
+      [id]
+    );
+
     const producto = {
-      ...result.rows[0],
-      categorias: result.rows[0].categoria_nombre ? {
-        nombre: result.rows[0].categoria_nombre,
-        slug: result.rows[0].categoria_slug
+      ...productoResult.rows[0],
+      categorias: productoResult.rows[0].categoria_nombre ? {
+        nombre: productoResult.rows[0].categoria_nombre,
+        slug: productoResult.rows[0].categoria_slug
       } : null,
-      proveedores: result.rows[0].proveedor_nombre ? {
-        nombre: result.rows[0].proveedor_nombre
-      } : null
+      proveedores: proveedoresResult.rows
     };
 
     res.json(producto);
@@ -89,11 +95,9 @@ router.post('/', authMiddleware, async (req, res) => {
       nombre,
       descripcion,
       categoria_id,
-      proveedor_id,
+      proveedores,
       imagen_principal,
       imagenes_adicionales,
-      especificaciones,
-      aplicaciones,
       destacado,
       activo
     } = req.body;
@@ -104,25 +108,41 @@ router.post('/', authMiddleware, async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO productos (
-        nombre, descripcion, categoria_id, proveedor_id, imagen_principal,
-        imagenes_adicionales, especificaciones, aplicaciones, destacado, activo, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
+        nombre, descripcion, categoria_id, imagen_principal,
+        imagenes_adicionales, destacado, activo, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
       RETURNING *`,
       [
         nombre,
         descripcion,
         categoria_id,
-        proveedor_id || null,
         imagen_principal || null,
-        imagenes_adicionales ? JSON.stringify(imagenes_adicionales) : null,
-        especificaciones ? JSON.stringify(especificaciones) : null,
-        aplicaciones || null,
+        imagenes_adicionales || null,
         destacado || false,
         activo !== false
       ]
     );
 
-    res.status(201).json(result.rows[0]);
+    const producto = result.rows[0];
+
+    if (proveedores && Array.isArray(proveedores)) {
+      for (const proveedor of proveedores) {
+        await pool.query(
+          `INSERT INTO producto_proveedores (producto_id, proveedor_id, precio, moneda, codigo_producto, disponible)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [
+            producto.id,
+            proveedor.proveedor_id,
+            proveedor.precio || null,
+            proveedor.moneda || 'USD',
+            proveedor.codigo_producto || null,
+            proveedor.disponible !== false
+          ]
+        );
+      }
+    }
+
+    res.status(201).json(producto);
   } catch (error) {
     console.error('Error al crear producto:', error);
     res.status(500).json({ error: 'Error al crear producto' });
@@ -136,11 +156,9 @@ router.put('/:id', authMiddleware, async (req, res) => {
       nombre,
       descripcion,
       categoria_id,
-      proveedor_id,
+      proveedores,
       imagen_principal,
       imagenes_adicionales,
-      especificaciones,
-      aplicaciones,
       destacado,
       activo
     } = req.body;
@@ -150,24 +168,19 @@ router.put('/:id', authMiddleware, async (req, res) => {
         nombre = COALESCE($1, nombre),
         descripcion = COALESCE($2, descripcion),
         categoria_id = COALESCE($3, categoria_id),
-        proveedor_id = $4,
-        imagen_principal = $5,
-        imagenes_adicionales = $6,
-        especificaciones = $7,
-        aplicaciones = $8,
-        destacado = COALESCE($9, destacado),
-        activo = COALESCE($10, activo)
-      WHERE id = $11
+        imagen_principal = $4,
+        imagenes_adicionales = $5,
+        destacado = COALESCE($6, destacado),
+        activo = COALESCE($7, activo),
+        updated_at = NOW()
+      WHERE id = $8
       RETURNING *`,
       [
         nombre,
         descripcion,
         categoria_id,
-        proveedor_id,
         imagen_principal,
-        imagenes_adicionales ? JSON.stringify(imagenes_adicionales) : null,
-        especificaciones ? JSON.stringify(especificaciones) : null,
-        aplicaciones,
+        imagenes_adicionales,
         destacado,
         activo,
         id
@@ -176,6 +189,27 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+
+    if (proveedores !== undefined) {
+      await pool.query('DELETE FROM producto_proveedores WHERE producto_id = $1', [id]);
+
+      if (Array.isArray(proveedores) && proveedores.length > 0) {
+        for (const proveedor of proveedores) {
+          await pool.query(
+            `INSERT INTO producto_proveedores (producto_id, proveedor_id, precio, moneda, codigo_producto, disponible)
+             VALUES ($1, $2, $3, $4, $5, $6)`,
+            [
+              id,
+              proveedor.proveedor_id,
+              proveedor.precio || null,
+              proveedor.moneda || 'USD',
+              proveedor.codigo_producto || null,
+              proveedor.disponible !== false
+            ]
+          );
+        }
+      }
     }
 
     res.json(result.rows[0]);

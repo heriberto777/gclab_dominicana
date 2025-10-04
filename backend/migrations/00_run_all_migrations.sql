@@ -23,6 +23,9 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- 6. Create settings table
 \i 06_create_settings_table.sql
 
+-- 7. Fix productos schema (remove old columns if exist)
+\i 07_fix_productos_schema.sql
+
 -- Verification queries
 SELECT 'Users table created' AS status, COUNT(*) AS count FROM users;
 SELECT 'Categorias table created' AS status, COUNT(*) AS count FROM categorias;
