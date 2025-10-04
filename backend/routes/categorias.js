@@ -69,7 +69,7 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 
     const result = await pool.query(
-      `INSERT INTO categorias (nombre, descripcion, slug, icono, orden, activo, created_at)
+      `INSERT INTO categorias (nombre, descripcion, slug, icono_url, orden, activo, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, NOW())
        RETURNING *`,
       [nombre, descripcion || '', slug, icono || '', orden || 0, activo !== false]
