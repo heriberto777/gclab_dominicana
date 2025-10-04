@@ -106,39 +106,42 @@ const ProductoDetail = () => {
 
                   {producto.proveedores && producto.proveedores.length > 0 && (
                     <div className="producto-proveedores-section">
-                      <h3 className="proveedores-titulo">Proveedores Disponibles:</h3>
-                      <div className="producto-proveedores-grid">
+                      <div className="proveedores-logos-row">
                         {producto.proveedores
                           .filter(prov => prov.disponible !== false)
                           .map((proveedor, idx) => (
-                            <div key={idx} className="proveedor-card-item">
-                              <div className="proveedor-logo-wrapper">
-                                {proveedor.logo_url ? (
-                                  <img
-                                    src={proveedor.logo_url}
-                                    alt={proveedor.nombre}
-                                    title={proveedor.nombre}
-                                  />
-                                ) : (
-                                  <div className="proveedor-name-placeholder">
-                                    {proveedor.nombre}
-                                  </div>
-                                )}
-                              </div>
-                              {proveedor.sitio_web && (
-                                <Button
-                                  onClick={() => window.open(proveedor.sitio_web, '_blank', 'noopener,noreferrer')}
-                                  variant="primary"
-                                >
-                                  Ver en {proveedor.nombre}
-                                </Button>
+                            <a
+                              key={idx}
+                              href={proveedor.sitio_web}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="proveedor-logo-link"
+                              title={`Ver ${proveedor.nombre}`}
+                            >
+                              {proveedor.logo_url ? (
+                                <img
+                                  src={proveedor.logo_url}
+                                  alt={proveedor.nombre}
+                                />
+                              ) : (
+                                <div className="proveedor-name-text">
+                                  {proveedor.nombre}
+                                </div>
                               )}
-                              {proveedor.precio && (
-                                <p className="proveedor-precio">
-                                  {proveedor.moneda || 'USD'} ${proveedor.precio}
-                                </p>
-                              )}
-                            </div>
+                            </a>
+                          ))}
+                      </div>
+                      <div className="proveedores-buttons-row">
+                        {producto.proveedores
+                          .filter(prov => prov.disponible !== false)
+                          .map((proveedor, idx) => (
+                            <Button
+                              key={idx}
+                              onClick={() => window.open(proveedor.sitio_web, '_blank', 'noopener,noreferrer')}
+                              variant="primary"
+                            >
+                              Saber más
+                            </Button>
                           ))}
                       </div>
                     </div>
