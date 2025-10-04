@@ -1,10 +1,93 @@
+import { useState, useEffect } from 'react';
 import Hero from '../components/organisms/Hero';
 import PageSection from '../components/templates/PageSection';
 import SectionTitle from '../components/molecules/SectionTitle';
 import Button from '../components/atoms/Button';
+import { supabase } from '../lib/supabase';
 import './Soporte.css';
 
 const Soporte = () => {
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    empresa: '',
+    telefono: '',
+    departamento: '',
+    mensaje: ''
+  });
+  const [webhookUrl, setWebhookUrl] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState('');
+
+  useEffect(() => {
+    const fetchWebhookUrl = async () => {
+      const { data } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'contact_webhook_url')
+        .maybeSingle();
+
+      if (data) {
+        setWebhookUrl(data.value);
+      }
+    };
+
+    fetchWebhookUrl();
+  }, []);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitMessage('');
+
+    if (!webhookUrl) {
+      setSubmitMessage('El formulario de contacto no está configurado. Por favor, contacte al administrador.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          timestamp: new Date().toISOString()
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al enviar el formulario');
+      }
+
+      const result = await response.json();
+
+      setSubmitMessage(result.message || 'Mensaje enviado exitosamente. Nos pondremos en contacto pronto.');
+      setFormData({
+        nombre: '',
+        email: '',
+        empresa: '',
+        telefono: '',
+        departamento: '',
+        mensaje: ''
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      setSubmitMessage('Hubo un error al enviar el mensaje. Por favor, intente de nuevo.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="soporte">
       <Hero
@@ -95,43 +178,89 @@ const Soporte = () => {
             title="Solicite Soporte Técnico"
             subtitle="Complete el formulario y nuestro equipo se pondrá en contacto con usted"
           />
-          <form className="soporte-form">
+          <form className="soporte-form" onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">
                 <label>Nombre Completo</label>
-                <input type="text" placeholder="Su nombre" />
+                <input
+                  type="text"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleChange}
+                  placeholder="Su nombre"
+                  required
+                />
               </div>
               <div className="form-group">
                 <label>Email</label>
-                <input type="email" placeholder="correo@ejemplo.com" />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="correo@ejemplo.com"
+                  required
+                />
               </div>
             </div>
             <div className="form-row">
               <div className="form-group">
                 <label>Empresa</label>
-                <input type="text" placeholder="Nombre de la empresa" />
+                <input
+                  type="text"
+                  name="empresa"
+                  value={formData.empresa}
+                  onChange={handleChange}
+                  placeholder="Nombre de la empresa"
+                />
               </div>
               <div className="form-group">
                 <label>Teléfono</label>
-                <input type="tel" placeholder="809-000-0000" />
+                <input
+                  type="tel"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleChange}
+                  placeholder="809-000-0000"
+                />
               </div>
             </div>
             <div className="form-group">
-              <label>Tipo de Servicio</label>
-              <select>
-                <option>Mantenimiento Preventivo</option>
-                <option>Reparación</option>
-                <option>Calibración</option>
-                <option>Instalación</option>
-                <option>Capacitación</option>
-                <option>Consulta General</option>
+              <label>Departamento</label>
+              <select
+                name="departamento"
+                value={formData.departamento}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Seleccione un departamento</option>
+                <option value="ventas">Ventas</option>
+                <option value="soporte">Soporte Técnico</option>
+                <option value="calibracion">Calibración</option>
+                <option value="mantenimiento">Mantenimiento</option>
+                <option value="capacitacion">Capacitación</option>
+                <option value="general">Consulta General</option>
               </select>
             </div>
             <div className="form-group">
               <label>Mensaje</label>
-              <textarea rows="5" placeholder="Describa su solicitud o consulta"></textarea>
+              <textarea
+                name="mensaje"
+                value={formData.mensaje}
+                onChange={handleChange}
+                rows="5"
+                placeholder="Describa su solicitud o consulta"
+                required
+              ></textarea>
             </div>
-            <Button variant="primary">Enviar Solicitud</Button>
+            {submitMessage && (
+              <div className={`form-message ${submitMessage.includes('error') || submitMessage.includes('Error') ? 'error' : 'success'}`}>
+                {submitMessage}
+              </div>
+            )}
+            <Button type="submit" variant="primary" disabled={isSubmitting}>
+              {isSubmitting ? 'Enviando...' : 'Enviar Solicitud'}
+            </Button>
           </form>
         </div>
       </PageSection>

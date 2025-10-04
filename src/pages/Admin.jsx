@@ -15,6 +15,7 @@ const Admin = () => {
   const [settings, setSettings] = useState({});
   const [loading, setLoading] = useState(true);
   const [webhookUrl, setWebhookUrl] = useState('');
+  const [contactWebhookUrl, setContactWebhookUrl] = useState('');
   const [savingWebhook, setSavingWebhook] = useState(false);
 
   useEffect(() => {
@@ -46,6 +47,7 @@ const Admin = () => {
         });
         setSettings(settingsMap);
         setWebhookUrl(settingsMap['n8n_webhook_url']?.value || '');
+        setContactWebhookUrl(settingsMap['contact_webhook_url']?.value || '');
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -86,13 +88,16 @@ const Admin = () => {
   const handleSaveWebhook = async () => {
     setSavingWebhook(true);
     try {
-      const { error } = await supabase
-        .from('settings')
-        .update({ value: webhookUrl })
-        .eq('key', 'n8n_webhook_url');
+      const updates = [
+        supabase.from('settings').update({ value: webhookUrl }).eq('key', 'n8n_webhook_url'),
+        supabase.from('settings').update({ value: contactWebhookUrl }).eq('key', 'contact_webhook_url')
+      ];
 
-      if (error) {
-        console.error('Error saving webhook:', error);
+      const results = await Promise.all(updates);
+      const hasError = results.some(result => result.error);
+
+      if (hasError) {
+        console.error('Error saving webhook:', results);
         alert('Error al guardar la configuración');
       } else {
         alert('Configuración guardada exitosamente');
@@ -346,7 +351,7 @@ const Admin = () => {
               <div className="settings-form">
                 <div className="form-group">
                   <label htmlFor="webhook-url" className="form-label">
-                    URL del Webhook de n8n
+                    URL del Webhook de n8n para Chatbot
                   </label>
                   <p className="form-help-text">
                     Esta URL se utilizará para conectar el chatbot con n8n. Asegúrate de que el webhook esté activo en tu instancia de n8n.
@@ -355,9 +360,26 @@ const Admin = () => {
                     id="webhook-url"
                     type="url"
                     className="form-input"
-                    placeholder="https://tu-instancia.n8n.cloud/webhook/tu-webhook-id"
+                    placeholder="https://tu-instancia.n8n.cloud/webhook/chatbot"
                     value={webhookUrl}
                     onChange={(e) => setWebhookUrl(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="contact-webhook-url" className="form-label">
+                    URL del Webhook de n8n para Formulario de Contacto
+                  </label>
+                  <p className="form-help-text">
+                    Esta URL se utilizará para enviar los datos del formulario de contacto a n8n y redirigirlos al departamento correspondiente.
+                  </p>
+                  <input
+                    id="contact-webhook-url"
+                    type="url"
+                    className="form-input"
+                    placeholder="https://tu-instancia.n8n.cloud/webhook/contacto"
+                    value={contactWebhookUrl}
+                    onChange={(e) => setContactWebhookUrl(e.target.value)}
                   />
                 </div>
 
@@ -371,7 +393,9 @@ const Admin = () => {
                 </div>
 
                 <div className="settings-info">
-                  <h3>Cómo configurar el webhook en n8n:</h3>
+                  <h3>Cómo configurar los webhooks en n8n:</h3>
+
+                  <h4>Webhook del Chatbot:</h4>
                   <ol>
                     <li>Crea un nuevo workflow en n8n</li>
                     <li>Agrega un nodo "Webhook" al inicio</li>
@@ -379,6 +403,16 @@ const Admin = () => {
                     <li>Copia la URL del webhook y pégala arriba</li>
                     <li>Agrega los nodos necesarios para procesar el mensaje</li>
                     <li>Asegúrate de que la respuesta tenga el formato: <code>{`{ "response": "texto de respuesta" }`}</code></li>
+                  </ol>
+
+                  <h4>Webhook del Formulario de Contacto:</h4>
+                  <ol>
+                    <li>Crea otro workflow en n8n</li>
+                    <li>Agrega un nodo "Webhook" al inicio</li>
+                    <li>El webhook recibirá: nombre, email, departamento, mensaje</li>
+                    <li>Usa un nodo "Switch" para enrutar según el departamento</li>
+                    <li>Conecta cada rama a diferentes nodos de email o notificación</li>
+                    <li>La respuesta debe ser: <code>{`{ "success": true, "message": "Mensaje enviado" }`}</code></li>
                   </ol>
                 </div>
               </div>
