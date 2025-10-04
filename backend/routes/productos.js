@@ -6,15 +6,21 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
-    const { categoria, destacado, activo } = req.query;
+    const { activo, categoria, destacado } = req.query;
+
     let query = `
       SELECT p.*, c.nombre as categoria_nombre, c.slug as categoria_slug
       FROM productos p
       LEFT JOIN categorias c ON p.categoria_id = c.id
       WHERE 1=1
     `;
+
     const params = [];
     let paramCount = 1;
+
+    if (activo !== 'false') {
+      query += ` AND p.activo = true`;
+    }
 
     if (categoria) {
       query += ` AND c.slug = $${paramCount}`;
@@ -26,23 +32,34 @@ router.get('/', async (req, res) => {
       query += ` AND p.destacado = true`;
     }
 
-    if (activo !== 'false') {
-      query += ` AND p.activo = true`;
-    }
-
-    query += ` ORDER BY p.created_at DESC`;
+    query += ' ORDER BY p.nombre ASC';
 
     const result = await pool.query(query, params);
 
-    const productos = result.rows.map(row => ({
-      ...row,
-      categorias: row.categoria_nombre ? {
-        nombre: row.categoria_nombre,
-        slug: row.categoria_slug
-      } : null
-    }));
+    const productosConProveedores = await Promise.all(
+      result.rows.map(async (producto) => {
+        const proveedoresResult = await pool.query(
+          `SELECT pr.id, pr.nombre, pr.slug, pr.logo_url, pr.sitio_web,
+                  pp.precio, pp.moneda, pp.codigo_producto, pp.disponible
+           FROM proveedores pr
+           INNER JOIN producto_proveedores pp ON pr.id = pp.proveedor_id
+           WHERE pp.producto_id = $1 AND pp.disponible = true
+           ORDER BY pr.nombre ASC`,
+          [producto.id]
+        );
 
-    res.json(productos);
+        return {
+          ...producto,
+          categorias: producto.categoria_nombre ? {
+            nombre: producto.categoria_nombre,
+            slug: producto.categoria_slug
+          } : null,
+          proveedores: proveedoresResult.rows
+        };
+      })
+    );
+
+    res.json(productosConProveedores);
   } catch (error) {
     console.error('Error al obtener productos:', error);
     res.status(500).json({ error: 'Error al obtener productos' });
@@ -66,10 +83,12 @@ router.get('/:id', async (req, res) => {
     }
 
     const proveedoresResult = await pool.query(
-      `SELECT pr.id, pr.nombre, pr.logo_url, pr.sitio_web, pp.precio, pp.moneda, pp.codigo_producto, pp.disponible
-       FROM producto_proveedores pp
-       JOIN proveedores pr ON pp.proveedor_id = pr.id
-       WHERE pp.producto_id = $1 AND pr.activo = true`,
+      `SELECT pr.id, pr.nombre, pr.slug, pr.logo_url, pr.sitio_web,
+              pp.precio, pp.moneda, pp.codigo_producto, pp.disponible
+       FROM proveedores pr
+       INNER JOIN producto_proveedores pp ON pr.id = pp.proveedor_id
+       WHERE pp.producto_id = $1
+       ORDER BY pr.nombre ASC`,
       [id]
     );
 
@@ -93,6 +112,7 @@ router.post('/', authMiddleware, async (req, res) => {
   try {
     const {
       nombre,
+      slug,
       descripcion,
       categoria_id,
       proveedores,
@@ -102,20 +122,28 @@ router.post('/', authMiddleware, async (req, res) => {
       activo
     } = req.body;
 
-    if (!nombre || !descripcion || !categoria_id) {
-      return res.status(400).json({ error: 'Nombre, descripción y categoría son requeridos' });
+    if (!nombre) {
+      return res.status(400).json({ error: 'Nombre es requerido' });
     }
+
+    const generatedSlug = slug || nombre
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
 
     const result = await pool.query(
       `INSERT INTO productos (
-        nombre, descripcion, categoria_id, imagen_principal,
+        nombre, slug, descripcion, categoria_id, imagen_principal,
         imagenes_adicionales, destacado, activo, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
       RETURNING *`,
       [
         nombre,
-        descripcion,
-        categoria_id,
+        generatedSlug,
+        descripcion || null,
+        categoria_id || null,
         imagen_principal || null,
         imagenes_adicionales || null,
         destacado || false,
@@ -154,6 +182,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
     const {
       nombre,
+      slug,
       descripcion,
       categoria_id,
       proveedores,
@@ -166,17 +195,19 @@ router.put('/:id', authMiddleware, async (req, res) => {
     const result = await pool.query(
       `UPDATE productos SET
         nombre = COALESCE($1, nombre),
-        descripcion = COALESCE($2, descripcion),
-        categoria_id = COALESCE($3, categoria_id),
-        imagen_principal = $4,
-        imagenes_adicionales = $5,
-        destacado = COALESCE($6, destacado),
-        activo = COALESCE($7, activo),
+        slug = COALESCE($2, slug),
+        descripcion = $3,
+        categoria_id = $4,
+        imagen_principal = $5,
+        imagenes_adicionales = $6,
+        destacado = COALESCE($7, destacado),
+        activo = COALESCE($8, activo),
         updated_at = NOW()
-      WHERE id = $8
+      WHERE id = $9
       RETURNING *`,
       [
         nombre,
+        slug,
         descripcion,
         categoria_id,
         imagen_principal,
@@ -194,7 +225,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
     if (proveedores !== undefined) {
       await pool.query('DELETE FROM producto_proveedores WHERE producto_id = $1', [id]);
 
-      if (Array.isArray(proveedores) && proveedores.length > 0) {
+      if (Array.isArray(proveedores)) {
         for (const proveedor of proveedores) {
           await pool.query(
             `INSERT INTO producto_proveedores (producto_id, proveedor_id, precio, moneda, codigo_producto, disponible)
@@ -222,6 +253,9 @@ router.put('/:id', authMiddleware, async (req, res) => {
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
+
+    await pool.query('DELETE FROM producto_proveedores WHERE producto_id = $1', [id]);
+
     const result = await pool.query('DELETE FROM productos WHERE id = $1 RETURNING id', [id]);
 
     if (result.rows.length === 0) {

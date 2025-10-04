@@ -41,17 +41,24 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { nombre, descripcion, sitio_web, contacto, activo } = req.body;
+    const { nombre, slug, descripcion, logo_url, sitio_web, activo } = req.body;
 
     if (!nombre) {
       return res.status(400).json({ error: 'Nombre es requerido' });
     }
 
+    const generatedSlug = slug || nombre
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+
     const result = await pool.query(
-      `INSERT INTO proveedores (nombre, descripcion, sitio_web, contacto, activo, created_at)
-       VALUES ($1, $2, $3, $4, $5, NOW())
+      `INSERT INTO proveedores (nombre, slug, descripcion, logo_url, sitio_web, activo, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, NOW())
        RETURNING *`,
-      [nombre, descripcion || '', sitio_web || null, contacto || null, activo !== false]
+      [nombre, generatedSlug, descripcion || null, logo_url || null, sitio_web || null, activo !== false]
     );
 
     res.status(201).json(result.rows[0]);
@@ -64,18 +71,20 @@ router.post('/', authMiddleware, async (req, res) => {
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, descripcion, sitio_web, contacto, activo } = req.body;
+    const { nombre, slug, descripcion, logo_url, sitio_web, activo } = req.body;
 
     const result = await pool.query(
       `UPDATE proveedores SET
         nombre = COALESCE($1, nombre),
-        descripcion = COALESCE($2, descripcion),
-        sitio_web = $3,
-        contacto = $4,
-        activo = COALESCE($5, activo)
-       WHERE id = $6
+        slug = COALESCE($2, slug),
+        descripcion = $3,
+        logo_url = $4,
+        sitio_web = $5,
+        activo = COALESCE($6, activo),
+        updated_at = NOW()
+       WHERE id = $7
        RETURNING *`,
-      [nombre, descripcion, sitio_web, contacto, activo, id]
+      [nombre, slug, descripcion, logo_url, sitio_web, activo, id]
     );
 
     if (result.rows.length === 0) {
@@ -94,7 +103,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
 
     const productsCheck = await pool.query(
-      'SELECT COUNT(*) FROM productos WHERE proveedor_id = $1',
+      'SELECT COUNT(*) FROM producto_proveedores WHERE proveedor_id = $1',
       [id]
     );
 
