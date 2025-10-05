@@ -401,6 +401,46 @@ class ApiClient {
     });
     return { data, error: null };
   }
+
+  async getMercados(activo = true) {
+    const data = await this.request(
+      `/mercados${activo !== false ? "?activo=true" : ""}`
+    );
+    return { data, error: null };
+  }
+
+  async getMercadoBySlug(slug) {
+    const data = await this.request(`/mercados/slug/${slug}`);
+    return { data, error: null };
+  }
+
+  async getMercado(id) {
+    const data = await this.request(`/mercados/${id}`);
+    return { data, error: null };
+  }
+
+  async createMercado(mercado) {
+    const data = await this.request("/mercados", {
+      method: "POST",
+      body: JSON.stringify(mercado),
+    });
+    return { data, error: null };
+  }
+
+  async updateMercado(id, mercado) {
+    const data = await this.request(`/mercados/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(mercado),
+    });
+    return { data, error: null };
+  }
+
+  async deleteMercado(id) {
+    const data = await this.request(`/mercados/${id}`, {
+      method: "DELETE",
+    });
+    return { data, error: null };
+  }
 }
 
 export const apiClient = new ApiClient();

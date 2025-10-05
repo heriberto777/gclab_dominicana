@@ -41,13 +41,9 @@ const Productos = () => {
   if (loading) {
     return (
       <div className="productos-page">
-        <Hero
-          title="Productos"
-          subtitle=""
-          image="https://images.pexels.com/photos/2280549/pexels-photo-2280549.jpeg?auto=compress&cs=tinysrgb&w=1600"
-        />
+        <Hero seccion="productos" />
         <PageSection>
-          <div style={{ textAlign: 'center', padding: '40px' }}>
+          <div style={{ textAlign: "center", padding: "40px" }}>
             <p>Cargando productos...</p>
           </div>
         </PageSection>

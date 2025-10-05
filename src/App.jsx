@@ -16,6 +16,7 @@ import ProveedorForm from './pages/ProveedorForm';
 import SocialMediaForm from "./pages/SocialMediaForm";
 import IndustriaForm from "./pages/IndustriaForm";
 import HeroForm from "./pages/HeroForm";
+import MercadoForm from "./pages/MercadoForm";
 
 function App() {
   return (
@@ -51,6 +52,8 @@ function App() {
           <Route path="/admin/industrias/:id" element={<IndustriaForm />} />
           <Route path="/admin/heroes/nuevo" element={<HeroForm />} />
           <Route path="/admin/heroes/:id" element={<HeroForm />} />
+          <Route path="/admin/mercados/nuevo" element={<MercadoForm />} />
+          <Route path="/admin/mercados/:id" element={<MercadoForm />} />
         </Routes>
       </Router>
     </AuthProvider>

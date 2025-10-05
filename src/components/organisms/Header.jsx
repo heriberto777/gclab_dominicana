@@ -26,15 +26,21 @@ const Header = () => {
     }
   };
 
-  const mercadoItems = [
-    { to: '/mercado/industria-farmaceutica', label: 'Industria Farmacéutica' },
-    { to: '/mercado/alimentos', label: 'Alimentos' },
-    { to: '/mercado/energia-minas-cemento', label: 'Energía, Minas y Cemento' },
-    { to: '/mercado/industria-quimica', label: 'Industria Química' },
-    { to: '/mercado/medio-ambiente', label: 'Medio Ambiente' },
-    { to: '/mercado/life-sciences', label: 'Life Sciences' },
-    { to: '/mercado/investigacion-desarrollo', label: 'Investigación y Desarrollo' },
-  ];
+   const loadMercados = async () => {
+     try {
+       const { data } = await apiClient.getMercados(true);
+       if (data) {
+         setMercados(data);
+       }
+     } catch (error) {
+       console.error("Error loading mercados:", error);
+     }
+   };
+
+    const mercadoItems = mercados.map((mercado) => ({
+      to: `/mercado/${mercado.slug}`,
+      label: mercado.nombre,
+    }));
 
   const productosItems = categorias.map(cat => ({
     to: `/productos/${cat.slug}`,

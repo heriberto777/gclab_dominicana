@@ -21,6 +21,7 @@ const Admin = () => {
   const [socialMedia, setSocialMedia] = useState([]);
   const [industrias, setIndustrias] = useState([]);
   const [heroes, setHeroes] = useState([]);
+  const [mercados, setMercados] = useState([]);
 
   useEffect(() => {
     if (!user) {
@@ -43,7 +44,9 @@ const Admin = () => {
       const socialMediaRes = await apiClient.getSocialMedia(false);
       const industriasRes = await apiClient.getIndustrias(false);
       const heroesRes = await apiClient.getHeroes(false);
+      const mercadosRes = await apiClient.getMercados(false);
 
+      if (mercadosRes.data) setMercados(mercadosRes.data);
       if (heroesRes.data) setHeroes(heroesRes.data);
       if (industriasRes.data) setIndustrias(industriasRes.data);
       if (socialMediaRes.data) setSocialMedia(socialMediaRes.data);
@@ -205,6 +208,12 @@ const Admin = () => {
             onClick={() => setActiveTab("heroes")}
           >
             Heroes ({heroes.length})
+          </button>
+          <button
+            className={`admin-tab ${activeTab === "mercados" ? "active" : ""}`}
+            onClick={() => setActiveTab("mercados")}
+          >
+            Mercados ({mercados.length})
           </button>
         </div>
 
@@ -827,6 +836,83 @@ const Admin = () => {
                             <button
                               className="btn-sm btn-delete"
                               onClick={() => handleDelete("heroes", hero.id)}
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "mercados" && (
+            <div className="admin-section">
+              <div className="section-header">
+                <h2>Gestión de Mercados</h2>
+                <Button onClick={() => navigate("/admin/mercados/nuevo")}>
+                  Nuevo Mercado
+                </Button>
+              </div>
+
+              <div className="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Slug</th>
+                      <th>Orden</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mercados.map((mercado) => (
+                      <tr key={mercado.id}>
+                        <td>{mercado.nombre}</td>
+                        <td>
+                          <code>/mercado/{mercado.slug}</code>
+                        </td>
+                        <td>{mercado.orden}</td>
+                        <td>
+                          <span
+                            className={`status-badge ${
+                              mercado.activo ? "active" : "inactive"
+                            }`}
+                          >
+                            {mercado.activo ? "Activo" : "Inactivo"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="action-buttons">
+                            <button
+                              className="btn-sm btn-edit"
+                              onClick={() =>
+                                navigate(`/admin/mercados/${mercado.id}`)
+                              }
+                            >
+                              Editar
+                            </button>
+                            <button
+                              className="btn-sm btn-toggle"
+                              onClick={() =>
+                                handleToggleActivo(
+                                  "mercados",
+                                  mercado.id,
+                                  mercado.activo
+                                )
+                              }
+                            >
+                              {mercado.activo ? "Desactivar" : "Activar"}
+                            </button>
+                            <button
+                              className="btn-sm btn-delete"
+                              onClick={() =>
+                                handleDelete("mercados", mercado.id)
+                              }
                             >
                               Eliminar
                             </button>

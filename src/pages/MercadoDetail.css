@@ -30,6 +30,63 @@
   margin: 0 0 48px 0;
 }
 
+.mercado-contenido {
+  font-size: 17px;
+  line-height: 1.8;
+  color: #333;
+  margin: 0 0 48px 0;
+}
+
+.mercado-contenido h1,
+.mercado-contenido h2,
+.mercado-contenido h3,
+.mercado-contenido h4 {
+  color: #0066cc;
+  margin: 24px 0 16px 0;
+  font-weight: 600;
+}
+
+.mercado-contenido h1 {
+  font-size: 32px;
+}
+
+.mercado-contenido h2 {
+  font-size: 28px;
+}
+
+.mercado-contenido h3 {
+  font-size: 24px;
+}
+
+.mercado-contenido h4 {
+  font-size: 20px;
+}
+
+.mercado-contenido p {
+  margin-bottom: 16px;
+}
+
+.mercado-contenido ul,
+.mercado-contenido ol {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+.mercado-contenido li {
+  margin-bottom: 8px;
+}
+
+.mercado-contenido strong,
+.mercado-contenido b {
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.mercado-contenido a {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
 .soluciones-title {
   font-size: 20px;
   font-weight: 700;
@@ -70,33 +127,6 @@
   margin: 48px 0 0 0;
 }
 
-.proveedores-carousel {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 60px;
-  padding: 60px 0;
-  flex-wrap: wrap;
-}
-
-.proveedor-slide {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.7;
-  transition: opacity 0.3s ease;
-}
-
-.proveedor-slide:hover {
-  opacity: 1;
-}
-
-.proveedor-slide img {
-  max-width: 150px;
-  height: auto;
-}
-
 @media (max-width: 968px) {
   .mercado-title {
     font-size: 36px;
@@ -110,21 +140,28 @@
     font-size: 16px;
   }
 
+  .mercado-contenido {
+    font-size: 16px;
+  }
+
+  .mercado-contenido h1 {
+    font-size: 28px;
+  }
+
+  .mercado-contenido h2 {
+    font-size: 24px;
+  }
+
+  .mercado-contenido h3 {
+    font-size: 20px;
+  }
+
   .soluciones-title {
     font-size: 18px;
   }
 
   .soluciones-list li {
     font-size: 15px;
-  }
-
-  .proveedores-carousel {
-    gap: 40px;
-    padding: 40px 0;
-  }
-
-  .proveedor-slide img {
-    max-width: 120px;
   }
 }
 
@@ -145,17 +182,24 @@
     font-size: 15px;
   }
 
+  .mercado-contenido {
+    font-size: 15px;
+  }
+
+  .mercado-contenido h1 {
+    font-size: 24px;
+  }
+
+  .mercado-contenido h2 {
+    font-size: 20px;
+  }
+
+  .mercado-contenido h3 {
+    font-size: 18px;
+  }
+
   .soluciones-list li {
     font-size: 14px;
     padding-left: 20px;
-  }
-
-  .proveedores-carousel {
-    gap: 30px;
-    padding: 30px 0;
-  }
-
-  .proveedor-slide img {
-    max-width: 100px;
   }
 }

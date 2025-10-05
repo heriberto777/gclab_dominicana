@@ -89,11 +89,7 @@ const Soporte = () => {
 
   return (
     <div className="soporte">
-      <Hero
-        title="Soporte y Servicio Técnico"
-        subtitle="Mantenimiento, calibración y soporte técnico especializado"
-        image="https://images.pexels.com/photos/8326726/pexels-photo-8326726.jpeg?auto=compress&cs=tinysrgb&w=1600"
-      />
+      <Hero seccion="soporte" />
 
       <PageSection>
         <SectionTitle
@@ -104,43 +100,45 @@ const Soporte = () => {
           <div className="servicio-card">
             <h3>Instalación y Puesta en Marcha</h3>
             <p>
-              Instalación profesional de equipos, validación inicial y capacitación
-              del personal operativo para garantizar el correcto funcionamiento desde el inicio.
+              Instalación profesional de equipos, validación inicial y
+              capacitación del personal operativo para garantizar el correcto
+              funcionamiento desde el inicio.
             </p>
           </div>
           <div className="servicio-card">
             <h3>Mantenimiento Preventivo</h3>
             <p>
-              Programas de mantenimiento preventivo para maximizar la vida útil de sus equipos
-              y prevenir paradas no planificadas en sus procesos.
+              Programas de mantenimiento preventivo para maximizar la vida útil
+              de sus equipos y prevenir paradas no planificadas en sus procesos.
             </p>
           </div>
           <div className="servicio-card">
             <h3>Calibración</h3>
             <p>
-              Servicios de calibración trazables a estándares internacionales, con emisión
-              de certificados que cumplen con normativas ISO y GMP.
+              Servicios de calibración trazables a estándares internacionales,
+              con emisión de certificados que cumplen con normativas ISO y GMP.
             </p>
           </div>
           <div className="servicio-card">
             <h3>Reparación</h3>
             <p>
-              Diagnóstico y reparación de equipos por técnicos certificados, utilizando
-              repuestos originales para garantizar la calidad del servicio.
+              Diagnóstico y reparación de equipos por técnicos certificados,
+              utilizando repuestos originales para garantizar la calidad del
+              servicio.
             </p>
           </div>
           <div className="servicio-card">
             <h3>Capacitación</h3>
             <p>
-              Programas de capacitación técnica para el personal, abarcando operación,
-              mantenimiento básico y mejores prácticas de uso.
+              Programas de capacitación técnica para el personal, abarcando
+              operación, mantenimiento básico y mejores prácticas de uso.
             </p>
           </div>
           <div className="servicio-card">
             <h3>Soporte Remoto</h3>
             <p>
-              Asistencia técnica remota para resolución rápida de consultas y solución
-              de problemas básicos sin necesidad de visita presencial.
+              Asistencia técnica remota para resolución rápida de consultas y
+              solución de problemas básicos sin necesidad de visita presencial.
             </p>
           </div>
         </div>
@@ -149,10 +147,7 @@ const Soporte = () => {
       <PageSection background="gray">
         <div className="soporte-info">
           <div className="soporte-info-content">
-            <SectionTitle
-              title="¿Por Qué Elegirnos?"
-              align="left"
-            />
+            <SectionTitle title="¿Por Qué Elegirnos?" align="left" />
             <ul className="soporte-benefits">
               <li>Técnicos certificados y con amplia experiencia</li>
               <li>Respuesta rápida a solicitudes de servicio</li>
@@ -253,12 +248,19 @@ const Soporte = () => {
               ></textarea>
             </div>
             {submitMessage && (
-              <div className={`form-message ${submitMessage.includes('error') || submitMessage.includes('Error') ? 'error' : 'success'}`}>
+              <div
+                className={`form-message ${
+                  submitMessage.includes("error") ||
+                  submitMessage.includes("Error")
+                    ? "error"
+                    : "success"
+                }`}
+              >
                 {submitMessage}
               </div>
             )}
             <Button type="submit" variant="primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Enviando...' : 'Enviar Solicitud'}
+              {isSubmitting ? "Enviando..." : "Enviar Solicitud"}
             </Button>
           </form>
         </div>

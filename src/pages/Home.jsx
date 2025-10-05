@@ -50,11 +50,7 @@ const Home = () => {
 
   return (
     <div className="home">
-      <Hero
-        title=""
-        subtitle=""
-        image="https://images.pexels.com/photos/3825540/pexels-photo-3825540.jpeg?auto=compress&cs=tinysrgb&w=1600"
-      />
+      <Hero seccion="home" />
 
       <PageSection>
         <div className="quienes-somos-section">

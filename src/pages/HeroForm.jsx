@@ -27,6 +27,7 @@ const HeroForm = () => {
 
   const seccionesDisponibles = [
     { value: "home", label: "Página Principal (Home)" },
+    { value: "mercados", label: "Mercados" },
     { value: "productos", label: "Productos" },
     { value: "quienes-somos", label: "Quienes Somos" },
     { value: "soporte", label: "Soporte Técnico" },

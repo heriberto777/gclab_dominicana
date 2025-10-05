@@ -246,6 +246,81 @@
   border-color: #0066cc;
 }
 
+/* Soluciones list styles */
+.soluciones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.solucion-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.solucion-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.solucion-input-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.solucion-input-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.solucion-input-container input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.2s;
+}
+
+.solucion-input-container input:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.remove-solucion-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: 2px solid #fc8181;
+  background: white;
+  color: #c53030;
+  border-radius: 8px;
+  font-size: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  line-height: 1;
+  padding: 0;
+}
+
+.remove-solucion-btn:hover {
+  background: #fed7d7;
+  border-color: #f56565;
+}
+
+.remove-solucion-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .form-actions {
   display: flex;
   justify-content: flex-end;

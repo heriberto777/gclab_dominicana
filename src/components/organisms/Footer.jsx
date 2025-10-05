@@ -6,20 +6,27 @@ import './Footer.css';
 
 const Footer = () => {
   const [socialMedia, setSocialMedia] = useState([]);
+  const [mercados, setMercados] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadSocialMedia();
+    loadData();
   }, []);
 
-  const loadSocialMedia = async () => {
+  const loadData = async () => {
     try {
-      const { data } = await apiClient.getSocialMedia(true);
-      if (data) {
-        setSocialMedia(data);
-      }
+      const [socialRes, mercadosRes, categoriasRes] = await Promise.all([
+        apiClient.getSocialMedia(true),
+        apiClient.getMercados(true),
+        apiClient.getCategorias(true)
+      ]);
+
+      if (socialRes.data) setSocialMedia(socialRes.data);
+      if (mercadosRes.data) setMercados(mercadosRes.data.slice(0, 4)); // Primeros 4
+      if (categoriasRes.data) setCategorias(categoriasRes.data.slice(0, 4)); // Primeros 4
     } catch (error) {
-      console.error('Error loading social media:', error);
+      console.error('Error loading footer data:', error);
     } finally {
       setLoading(false);
     }
@@ -39,7 +46,7 @@ const Footer = () => {
             {!loading && socialMedia.length > 0 && (
               <div className="footer-social-media">
                 {socialMedia.map((social) => (
-                  <a /* ⬅️ ESTA LÍNEA FALTABA */
+                  <a
                     key={social.id}
                     href={social.url}
                     target="_blank"
@@ -65,46 +72,34 @@ const Footer = () => {
           <div className="footer-column">
             <h4 className="footer-title">Mercado</h4>
             <ul className="footer-links">
-              <li>
-                <Link to="/mercado/industria-farmaceutica">
-                  Industria Farmacéutica
-                </Link>
-              </li>
-              <li>
-                <Link to="/mercado/alimentos">Alimentos</Link>
-              </li>
-              <li>
-                <Link to="/mercado/energia-minas-cemento">
-                  Energía, Minas y Cemento
-                </Link>
-              </li>
-              <li>
-                <Link to="/mercado/medio-ambiente">Medio Ambiente</Link>
-              </li>
+              {loading ? (
+                <li>Cargando...</li>
+              ) : mercados.length > 0 ? (
+                mercados.map((mercado) => (
+                  <li key={mercado.id}>
+                    <Link to={`/mercado/${mercado.slug}`}>{mercado.nombre}</Link>
+                  </li>
+                ))
+              ) : (
+                <li>No hay mercados disponibles</li>
+              )}
             </ul>
           </div>
 
           <div className="footer-column">
             <h4 className="footer-title">Productos</h4>
             <ul className="footer-links">
-              <li>
-                <Link to="/productos/instrumentos-analiticos">
-                  Instrumentos Analíticos
-                </Link>
-              </li>
-              <li>
-                <Link to="/productos/equipos-miscelaneos">
-                  Equipos Misceláneos
-                </Link>
-              </li>
-              <li>
-                <Link to="/productos/material-consumibles">
-                  Material y Consumibles
-                </Link>
-              </li>
-              <li>
-                <Link to="/productos/reactivos">Reactivos</Link>
-              </li>
+              {loading ? (
+                <li>Cargando...</li>
+              ) : categorias.length > 0 ? (
+                categorias.map((categoria) => (
+                  <li key={categoria.id}>
+                    <Link to={`/productos/${categoria.slug}`}>{categoria.nombre}</Link>
+                  </li>
+                ))
+              ) : (
+                <li>No hay productos disponibles</li>
+              )}
             </ul>
           </div>
 
