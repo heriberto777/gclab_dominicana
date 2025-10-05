@@ -20,6 +20,7 @@ const Admin = () => {
   const [savingWebhook, setSavingWebhook] = useState(false);
   const [socialMedia, setSocialMedia] = useState([]);
   const [industrias, setIndustrias] = useState([]);
+  const [heroes, setHeroes] = useState([]);
 
   useEffect(() => {
     if (!user) {
@@ -41,7 +42,9 @@ const Admin = () => {
 
       const socialMediaRes = await apiClient.getSocialMedia(false);
       const industriasRes = await apiClient.getIndustrias(false);
+      const heroesRes = await apiClient.getHeroes(false);
 
+      if (heroesRes.data) setHeroes(heroesRes.data);
       if (industriasRes.data) setIndustrias(industriasRes.data);
       if (socialMediaRes.data) setSocialMedia(socialMediaRes.data);
       if (productosRes.data) setProductos(productosRes.data);
@@ -78,6 +81,7 @@ const Admin = () => {
         proveedores: apiClient.updateProveedor,
         social_media: apiClient.updateSocialMedia,
         industrias: apiClient.updateIndustria,
+        heroes: apiClient.updateHero,
       };
 
       const updateMethod = updateMethods[table];
@@ -101,6 +105,7 @@ const Admin = () => {
         proveedores: apiClient.deleteProveedor,
         social_media: apiClient.deleteSocialMedia,
         industrias: apiClient.deleteIndustria,
+        heroes: apiClient.deleteHero,
       };
 
       const deleteMethod = deleteMethods[table];
@@ -194,6 +199,12 @@ const Admin = () => {
             onClick={() => setActiveTab("industrias")}
           >
             Industrias ({industrias.length})
+          </button>
+          <button
+            className={`admin-tab ${activeTab === "heroes" ? "active" : ""}`}
+            onClick={() => setActiveTab("heroes")}
+          >
+            Heroes ({heroes.length})
           </button>
         </div>
 
@@ -733,6 +744,89 @@ const Admin = () => {
                               onClick={() =>
                                 handleDelete("industrias", industria.id)
                               }
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "heroes" && (
+            <div className="admin-section">
+              <div className="section-header">
+                <h2>Gestión de Heroes</h2>
+                <Button onClick={() => navigate("/admin/heroes/nuevo")}>
+                  Nuevo Hero
+                </Button>
+              </div>
+
+              <div className="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Sección</th>
+                      <th>Título</th>
+                      <th>Subtítulo</th>
+                      <th>CTA</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {heroes.map((hero) => (
+                      <tr key={hero.id}>
+                        <td>
+                          <code>{hero.seccion}</code>
+                        </td>
+                        <td>{hero.titulo || "-"}</td>
+                        <td>
+                          {hero.subtitulo
+                            ? hero.subtitulo.length > 50
+                              ? hero.subtitulo.substring(0, 50) + "..."
+                              : hero.subtitulo
+                            : "-"}
+                        </td>
+                        <td>{hero.cta_texto || "-"}</td>
+                        <td>
+                          <span
+                            className={`status-badge ${
+                              hero.activo ? "active" : "inactive"
+                            }`}
+                          >
+                            {hero.activo ? "Activo" : "Inactivo"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="action-buttons">
+                            <button
+                              className="btn-sm btn-edit"
+                              onClick={() =>
+                                navigate(`/admin/heroes/${hero.id}`)
+                              }
+                            >
+                              Editar
+                            </button>
+                            <button
+                              className="btn-sm btn-toggle"
+                              onClick={() =>
+                                handleToggleActivo(
+                                  "heroes",
+                                  hero.id,
+                                  hero.activo
+                                )
+                              }
+                            >
+                              {hero.activo ? "Desactivar" : "Activar"}
+                            </button>
+                            <button
+                              className="btn-sm btn-delete"
+                              onClick={() => handleDelete("heroes", hero.id)}
                             >
                               Eliminar
                             </button>

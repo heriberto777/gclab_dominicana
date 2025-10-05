@@ -361,6 +361,46 @@ class ApiClient {
     });
     return { data, error: null };
   }
+
+  async getHeroes(activo = true) {
+    const data = await this.request(
+      `/heroes${activo !== false ? "?activo=true" : ""}`
+    );
+    return { data, error: null };
+  }
+
+  async getHeroBySeccion(seccion) {
+    const data = await this.request(`/heroes/seccion/${seccion}`);
+    return { data, error: null };
+  }
+
+  async getHero(id) {
+    const data = await this.request(`/heroes/${id}`);
+    return { data, error: null };
+  }
+
+  async createHero(hero) {
+    const data = await this.request("/heroes", {
+      method: "POST",
+      body: JSON.stringify(hero),
+    });
+    return { data, error: null };
+  }
+
+  async updateHero(id, hero) {
+    const data = await this.request(`/heroes/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(hero),
+    });
+    return { data, error: null };
+  }
+
+  async deleteHero(id) {
+    const data = await this.request(`/heroes/${id}`, {
+      method: "DELETE",
+    });
+    return { data, error: null };
+  }
 }
 
 export const apiClient = new ApiClient();

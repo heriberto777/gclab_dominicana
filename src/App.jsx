@@ -14,6 +14,8 @@ import ProductoForm from './pages/ProductoForm';
 import CategoriaForm from './pages/CategoriaForm';
 import ProveedorForm from './pages/ProveedorForm';
 import SocialMediaForm from "./pages/SocialMediaForm";
+import IndustriaForm from "./pages/IndustriaForm";
+import HeroForm from "./pages/HeroForm";
 
 function App() {
   return (
@@ -45,6 +47,10 @@ function App() {
             path="/admin/redes-sociales/:id"
             element={<SocialMediaForm />}
           />
+          <Route path="/admin/industrias/nueva" element={<IndustriaForm />} />
+          <Route path="/admin/industrias/:id" element={<IndustriaForm />} />
+          <Route path="/admin/heroes/nuevo" element={<HeroForm />} />
+          <Route path="/admin/heroes/:id" element={<HeroForm />} />
         </Routes>
       </Router>
     </AuthProvider>
