@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 import { apiClient } from "../../lib/api";
 import Logo from "../atoms/Logo";
 import NavItem from "../molecules/NavItem";
+import SearchBar from "../molecules/SearchBar";
 import Icon from "../atoms/Icon";
 import "./Header.css";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [categorias, setCategorias] = useState([]);
   const [mercados, setMercados] = useState([]);
 
@@ -49,37 +51,59 @@ const Header = () => {
   }));
 
   return (
-    <header className="header">
-      <div className="header-container">
-        <Link to="/">
-          <Logo type="navbar" size="medium" />
-        </Link>
+    <>
+      <header className="header">
+        <div className="header-container">
+          <Link to="/">
+            <Logo type="navbar" size="medium" />
+          </Link>
 
-        <nav className={`nav ${mobileMenuOpen ? "nav-open" : ""}`}>
-          <NavItem to="/">Inicio</NavItem>
-          <NavItem to="/quienes-somos">Quienes Somos</NavItem>
-          <NavItem
-            to="/mercado/industria-farmaceutica"
-            hasDropdown
-            dropdownItems={mercadoItems}
-          >
-            Mercado
-          </NavItem>
-          <NavItem to="/productos" hasDropdown dropdownItems={productosItems}>
-            Productos
-          </NavItem>
-          <NavItem to="/soporte">Soporte y Servicio Técnico</NavItem>
-        </nav>
+          <nav className={`nav ${mobileMenuOpen ? "nav-open" : ""}`}>
+            <NavItem to="/">Inicio</NavItem>
+            <NavItem to="/quienes-somos">Quienes Somos</NavItem>
+            <NavItem
+              to="/mercado/industria-farmaceutica"
+              hasDropdown
+              dropdownItems={mercadoItems}
+            >
+              Mercado
+            </NavItem>
+            <NavItem to="/productos" hasDropdown dropdownItems={productosItems}>
+              Productos
+            </NavItem>
+            <NavItem to="/soporte">Soporte y Servicio Técnico</NavItem>
+          </nav>
 
-        <button
-          className="mobile-menu-button"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          <Icon name={mobileMenuOpen ? "close" : "menu"} size={28} />
-        </button>
-      </div>
-    </header>
+          <div className="header-actions">
+            <button
+              className="search-toggle-btn"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Abrir búsqueda"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+            </button>
+
+            <button
+              className="mobile-menu-button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              <Icon name={mobileMenuOpen ? "close" : "menu"} size={28} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <SearchBar isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+    </>
   );
 };
 

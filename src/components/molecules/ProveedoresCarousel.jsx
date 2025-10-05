@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { apiClient } from '../../lib/api';
-import './ProveedoresCarousel.css';
+import { useState, useEffect } from "react";
+import { apiClient } from "../../lib/api";
+import "./ProveedoresCarousel.css";
 
 const ProveedoresCarousel = () => {
   const [proveedores, setProveedores] = useState([]);
@@ -15,7 +15,9 @@ const ProveedoresCarousel = () => {
     if (!isAutoPlaying || proveedores.length === 0) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % Math.ceil(proveedores.length / getVisibleCount()));
+      setCurrentIndex(
+        (prev) => (prev + 1) % Math.ceil(proveedores.length / getVisibleCount())
+      );
     }, 3000);
 
     return () => clearInterval(interval);
@@ -24,11 +26,12 @@ const ProveedoresCarousel = () => {
   const loadProveedores = async () => {
     try {
       const { data } = await apiClient.getProveedores(true);
-      if (data) {
+      if (data && data.length > 0) {
+        console.log("Proveedores cargados:", data);
         setProveedores(data);
       }
     } catch (error) {
-      console.error('Error loading proveedores:', error);
+      console.error("Error loading proveedores:", error);
     }
   };
 
@@ -45,11 +48,14 @@ const ProveedoresCarousel = () => {
       setVisibleCount(getVisibleCount());
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const maxIndex = Math.ceil(proveedores.length / visibleCount) - 1;
+  const maxIndex = Math.max(
+    0,
+    Math.ceil(proveedores.length / visibleCount) - 1
+  );
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
@@ -67,11 +73,21 @@ const ProveedoresCarousel = () => {
   };
 
   if (proveedores.length === 0) {
-    return null;
+    return (
+      <div className="proveedores-carousel">
+        <h2 className="proveedores-carousel-title">Nuestros Proveedores</h2>
+        <div style={{ textAlign: "center", padding: "40px 0", color: "#666" }}>
+          <p>No hay proveedores disponibles</p>
+        </div>
+      </div>
+    );
   }
 
   const startIndex = currentIndex * visibleCount;
-  const visibleProveedores = proveedores.slice(startIndex, startIndex + visibleCount);
+  const visibleProveedores = proveedores.slice(
+    startIndex,
+    startIndex + visibleCount
+  );
 
   return (
     <div className="proveedores-carousel">
@@ -87,23 +103,40 @@ const ProveedoresCarousel = () => {
         </button>
 
         <div className="carousel-track">
-          {visibleProveedores.map((proveedor) => (
-            <div key={proveedor.id} className="carousel-slide">
-              <div className="proveedor-card">
-                {proveedor.logo_url ? (
-                  <img
-                    src={proveedor.logo_url}
-                    alt={proveedor.nombre}
-                    className="proveedor-logo"
-                  />
-                ) : (
-                  <div className="proveedor-placeholder">
-                    {proveedor.nombre}
-                  </div>
-                )}
+          {visibleProveedores.map((proveedor) => {
+            const hasValidLogo =
+              proveedor.logo_url && proveedor.logo_url.trim() !== "";
+
+            return (
+              <div key={proveedor.id} className="carousel-slide">
+                <div className="proveedor-card">
+                  {hasValidLogo ? (
+                    <img
+                      src={proveedor.logo_url}
+                      alt={proveedor.nombre}
+                      className="proveedor-logo"
+                      onError={(e) => {
+                        console.error(
+                          "Error cargando logo:",
+                          proveedor.nombre,
+                          proveedor.logo_url
+                        );
+                        e.target.style.display = "none";
+                        const placeholder = document.createElement("div");
+                        placeholder.className = "proveedor-placeholder";
+                        placeholder.textContent = proveedor.nombre;
+                        e.target.parentElement.appendChild(placeholder);
+                      }}
+                    />
+                  ) : (
+                    <div className="proveedor-placeholder">
+                      {proveedor.nombre}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <button
@@ -115,16 +148,20 @@ const ProveedoresCarousel = () => {
         </button>
       </div>
 
-      <div className="carousel-dots">
-        {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-          <button
-            key={index}
-            className={`carousel-dot ${index === currentIndex ? 'active' : ''}`}
-            onClick={() => goToSlide(index)}
-            aria-label={`Ir a grupo ${index + 1}`}
-          />
-        ))}
-      </div>
+      {maxIndex > 0 && (
+        <div className="carousel-dots">
+          {Array.from({ length: maxIndex + 1 }).map((_, index) => (
+            <button
+              key={index}
+              className={`carousel-dot ${
+                index === currentIndex ? "active" : ""
+              }`}
+              onClick={() => goToSlide(index)}
+              aria-label={`Ir a grupo ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
