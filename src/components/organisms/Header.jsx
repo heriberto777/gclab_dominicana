@@ -1,50 +1,51 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { apiClient } from '../../lib/api';
-import Logo from '../atoms/Logo';
-import NavItem from '../molecules/NavItem';
-import Icon from '../atoms/Icon';
-import './Header.css';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { apiClient } from "../../lib/api";
+import Logo from "../atoms/Logo";
+import NavItem from "../molecules/NavItem";
+import Icon from "../atoms/Icon";
+import "./Header.css";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [categorias, setCategorias] = useState([]);
+  const [mercados, setMercados] = useState([]);
 
   useEffect(() => {
     loadCategorias();
+    loadMercados();
   }, []);
 
   const loadCategorias = async () => {
     try {
       const { data } = await apiClient.getCategorias(true);
-
       if (data) {
         setCategorias(data);
       }
     } catch (error) {
-      console.error('Error loading categories:', error);
+      console.error("Error loading categories:", error);
     }
   };
 
-   const loadMercados = async () => {
-     try {
-       const { data } = await apiClient.getMercados(true);
-       if (data) {
-         setMercados(data);
-       }
-     } catch (error) {
-       console.error("Error loading mercados:", error);
-     }
-   };
+  const loadMercados = async () => {
+    try {
+      const { data } = await apiClient.getMercados(true);
+      if (data) {
+        setMercados(data);
+      }
+    } catch (error) {
+      console.error("Error loading mercados:", error);
+    }
+  };
 
-    const mercadoItems = mercados.map((mercado) => ({
-      to: `/mercado/${mercado.slug}`,
-      label: mercado.nombre,
-    }));
+  const mercadoItems = mercados.map((mercado) => ({
+    to: `/mercado/${mercado.slug}`,
+    label: mercado.nombre,
+  }));
 
-  const productosItems = categorias.map(cat => ({
+  const productosItems = categorias.map((cat) => ({
     to: `/productos/${cat.slug}`,
-    label: cat.nombre
+    label: cat.nombre,
   }));
 
   return (

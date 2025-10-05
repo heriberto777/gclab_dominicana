@@ -22,6 +22,7 @@ const Admin = () => {
   const [industrias, setIndustrias] = useState([]);
   const [heroes, setHeroes] = useState([]);
   const [mercados, setMercados] = useState([]);
+  const [serviciosTecnicos, setServiciosTecnicos] = useState([]);
 
   useEffect(() => {
     if (!user) {
@@ -45,7 +46,10 @@ const Admin = () => {
       const industriasRes = await apiClient.getIndustrias(false);
       const heroesRes = await apiClient.getHeroes(false);
       const mercadosRes = await apiClient.getMercados(false);
+      const serviciosTecnicosRes = await apiClient.getServiciosTecnicos(false);
 
+      if (serviciosTecnicosRes.data)
+        setServiciosTecnicos(serviciosTecnicosRes.data);
       if (mercadosRes.data) setMercados(mercadosRes.data);
       if (heroesRes.data) setHeroes(heroesRes.data);
       if (industriasRes.data) setIndustrias(industriasRes.data);
@@ -85,6 +89,8 @@ const Admin = () => {
         social_media: apiClient.updateSocialMedia,
         industrias: apiClient.updateIndustria,
         heroes: apiClient.updateHero,
+        mercados: apiClient.updateMercado,
+        "servicios-tecnicos": apiClient.updateServicioTecnico,
       };
 
       const updateMethod = updateMethods[table];
@@ -109,6 +115,8 @@ const Admin = () => {
         social_media: apiClient.deleteSocialMedia,
         industrias: apiClient.deleteIndustria,
         heroes: apiClient.deleteHero,
+        mercados: apiClient.deleteMercado,
+        "servicios-tecnicos": apiClient.deleteServicioTecnico,
       };
 
       const deleteMethod = deleteMethods[table];
@@ -214,6 +222,14 @@ const Admin = () => {
             onClick={() => setActiveTab("mercados")}
           >
             Mercados ({mercados.length})
+          </button>
+          <button
+            className={`admin-tab ${
+              activeTab === "servicios-tecnicos" ? "active" : ""
+            }`}
+            onClick={() => setActiveTab("servicios-tecnicos")}
+          >
+            Servicios Técnicos ({serviciosTecnicos.length})
           </button>
         </div>
 
@@ -912,6 +928,108 @@ const Admin = () => {
                               className="btn-sm btn-delete"
                               onClick={() =>
                                 handleDelete("mercados", mercado.id)
+                              }
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+          {activeTab === "servicios-tecnicos" && (
+            <div className="admin-section">
+              <div className="section-header">
+                <h2>Gestión de Servicios Técnicos</h2>
+                <Button
+                  onClick={() => navigate("/admin/servicios-tecnicos/nuevo")}
+                >
+                  Nuevo Servicio
+                </Button>
+              </div>
+
+              <div className="data-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Título</th>
+                      <th>Slug</th>
+                      <th>Orden</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {serviciosTecnicos.map((servicio) => (
+                      <tr key={servicio.id}>
+                        <td>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "12px",
+                            }}
+                          >
+                            {servicio.imagen_url && (
+                              <img
+                                src={servicio.imagen_url}
+                                alt={servicio.titulo}
+                                style={{
+                                  width: "60px",
+                                  height: "40px",
+                                  objectFit: "cover",
+                                  borderRadius: "4px",
+                                }}
+                              />
+                            )}
+                            {servicio.titulo}
+                          </div>
+                        </td>
+                        <td>
+                          <code>{servicio.slug}</code>
+                        </td>
+                        <td>{servicio.orden}</td>
+                        <td>
+                          <span
+                            className={`status-badge ${
+                              servicio.activo ? "active" : "inactive"
+                            }`}
+                          >
+                            {servicio.activo ? "Activo" : "Inactivo"}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="action-buttons">
+                            <button
+                              className="btn-sm btn-edit"
+                              onClick={() =>
+                                navigate(
+                                  `/admin/servicios-tecnicos/${servicio.id}`
+                                )
+                              }
+                            >
+                              Editar
+                            </button>
+                            <button
+                              className="btn-sm btn-toggle"
+                              onClick={() =>
+                                handleToggleActivo(
+                                  "servicios-tecnicos",
+                                  servicio.id,
+                                  servicio.activo
+                                )
+                              }
+                            >
+                              {servicio.activo ? "Desactivar" : "Activar"}
+                            </button>
+                            <button
+                              className="btn-sm btn-delete"
+                              onClick={() =>
+                                handleDelete("servicios-tecnicos", servicio.id)
                               }
                             >
                               Eliminar

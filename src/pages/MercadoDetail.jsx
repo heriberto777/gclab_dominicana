@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { apiClient } from '../lib/api';
-import Hero from '../components/organisms/Hero';
 import PageSection from '../components/templates/PageSection';
 import Button from '../components/atoms/Button';
 import ProveedoresCarousel from '../components/molecules/ProveedoresCarousel';

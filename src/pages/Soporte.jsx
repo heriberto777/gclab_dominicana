@@ -1,87 +1,105 @@
-import { useState, useEffect } from 'react';
-import Hero from '../components/organisms/Hero';
-import PageSection from '../components/templates/PageSection';
-import SectionTitle from '../components/molecules/SectionTitle';
-import Button from '../components/atoms/Button';
-import { apiClient } from '../lib/api';
-import './Soporte.css';
+import { useState, useEffect } from "react";
+import { apiClient } from "../lib/api";
+import Hero from "../components/organisms/Hero";
+import PageSection from "../components/templates/PageSection";
+import Button from "../components/atoms/Button";
+import "./Soporte.css";
 
 const Soporte = () => {
+  const [servicios, setServicios] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
-    nombre: '',
-    email: '',
-    empresa: '',
-    telefono: '',
-    departamento: '',
-    mensaje: ''
+    nombre: "",
+    email: "",
+    empresa: "",
+    telefono: "",
+    departamento: "",
+    mensaje: "",
   });
-  const [webhookUrl, setWebhookUrl] = useState('');
+  const [webhookUrl, setWebhookUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState('');
+  const [submitMessage, setSubmitMessage] = useState("");
 
   useEffect(() => {
-    const fetchWebhookUrl = async () => {
-      try {
-        const { data } = await apiClient.getSetting('contact_webhook_url');
-        if (data) {
-          setWebhookUrl(data.value);
-        }
-      } catch (error) {
-        console.error('Error fetching webhook URL:', error);
-      }
-    };
-
-    fetchWebhookUrl();
+    loadData();
   }, []);
+
+  const loadData = async () => {
+    try {
+      const [serviciosRes, webhookRes] = await Promise.all([
+        apiClient.getServiciosTecnicos(true),
+        apiClient.getSetting("contact_webhook_url"),
+      ]);
+
+      if (serviciosRes.data) {
+        setServicios(serviciosRes.data);
+      }
+
+      if (webhookRes.data) {
+        setWebhookUrl(webhookRes.data.value);
+      }
+    } catch (error) {
+      console.error("Error loading data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitMessage('');
+    setSubmitMessage("");
 
     if (!webhookUrl) {
-      setSubmitMessage('El formulario de contacto no está configurado. Por favor, contacte al administrador.');
+      setSubmitMessage(
+        "El formulario de contacto no está configurado. Por favor, contacte al administrador."
+      );
       setIsSubmitting(false);
       return;
     }
 
     try {
       const response = await fetch(webhookUrl, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...formData,
-          timestamp: new Date().toISOString()
-        })
+          timestamp: new Date().toISOString(),
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Error al enviar el formulario');
+        throw new Error("Error al enviar el formulario");
       }
 
       const result = await response.json();
 
-      setSubmitMessage(result.message || 'Mensaje enviado exitosamente. Nos pondremos en contacto pronto.');
+      setSubmitMessage(
+        result.message ||
+          "Mensaje enviado exitosamente. Nos pondremos en contacto pronto."
+      );
       setFormData({
-        nombre: '',
-        email: '',
-        empresa: '',
-        telefono: '',
-        departamento: '',
-        mensaje: ''
+        nombre: "",
+        email: "",
+        empresa: "",
+        telefono: "",
+        departamento: "",
+        mensaje: "",
       });
     } catch (error) {
-      console.error('Error:', error);
-      setSubmitMessage('Hubo un error al enviar el mensaje. Por favor, intente de nuevo.');
+      console.error("Error:", error);
+      setSubmitMessage(
+        "Hubo un error al enviar el mensaje. Por favor, intente de nuevo."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -92,86 +110,76 @@ const Soporte = () => {
       <Hero seccion="soporte" />
 
       <PageSection>
-        <SectionTitle
-          title="Nuestros Servicios"
-          subtitle="Ofrecemos soporte técnico integral para garantizar el óptimo funcionamiento de sus equipos"
-        />
-        <div className="servicios-grid">
-          <div className="servicio-card">
-            <h3>Instalación y Puesta en Marcha</h3>
-            <p>
-              Instalación profesional de equipos, validación inicial y
-              capacitación del personal operativo para garantizar el correcto
-              funcionamiento desde el inicio.
-            </p>
-          </div>
-          <div className="servicio-card">
-            <h3>Mantenimiento Preventivo</h3>
-            <p>
-              Programas de mantenimiento preventivo para maximizar la vida útil
-              de sus equipos y prevenir paradas no planificadas en sus procesos.
-            </p>
-          </div>
-          <div className="servicio-card">
-            <h3>Calibración</h3>
-            <p>
-              Servicios de calibración trazables a estándares internacionales,
-              con emisión de certificados que cumplen con normativas ISO y GMP.
-            </p>
-          </div>
-          <div className="servicio-card">
-            <h3>Reparación</h3>
-            <p>
-              Diagnóstico y reparación de equipos por técnicos certificados,
-              utilizando repuestos originales para garantizar la calidad del
-              servicio.
-            </p>
-          </div>
-          <div className="servicio-card">
-            <h3>Capacitación</h3>
-            <p>
-              Programas de capacitación técnica para el personal, abarcando
-              operación, mantenimiento básico y mejores prácticas de uso.
-            </p>
-          </div>
-          <div className="servicio-card">
-            <h3>Soporte Remoto</h3>
-            <p>
-              Asistencia técnica remota para resolución rápida de consultas y
-              solución de problemas básicos sin necesidad de visita presencial.
-            </p>
-          </div>
+        <div className="soporte-intro">
+          <p className="soporte-intro-text">
+            Desde la consulta técnica hasta la instalación, y durante toda la
+            vida útil del instrumento, los servicios de GCLAB Dominicana brindan
+            a nuestros clientes un soporte dedicado para mantener, optimizar y
+            garantizar una óptima productividad de sus instrumentos y llevar al
+            máximo el tiempo de actividad, bombeando el desempeño de su
+            laboratorio.
+          </p>
+          <p className="soporte-intro-text">
+            En GCLAB Dominicana entendemos que resultados confiables solo pueden
+            ser obtenidos a través de equipos confiables y en las mejores
+            condiciones de operación, para ellos contamos con un excelente
+            equipo de profesionales formados en los servicios de entrenamiento
+            de nuestras representadas.
+          </p>
+          <p className="soporte-intro-text">
+            Les presentamos un enfoque de soporte no solo orientado a la venta,
+            la instalación y la garantía de su equipo sino a mejorar el
+            desempeño de su laboratorio, incorporando el servicio técnico
+            integrado que busca mejorar la eficiencia, la calidad de los
+            resultados y la reducción de costos de operación. Nuestro portafolio
+            de actividades le permitirá potenciar el desempeño de su laboratorio
+            y la efectividad de su personal técnico.
+          </p>
         </div>
       </PageSection>
 
-      <PageSection background="gray">
-        <div className="soporte-info">
-          <div className="soporte-info-content">
-            <SectionTitle title="¿Por Qué Elegirnos?" align="left" />
-            <ul className="soporte-benefits">
-              <li>Técnicos certificados y con amplia experiencia</li>
-              <li>Respuesta rápida a solicitudes de servicio</li>
-              <li>Repuestos originales en stock</li>
-              <li>Contratos de mantenimiento flexibles</li>
-              <li>Disponibilidad para emergencias</li>
-              <li>Documentación completa y trazable</li>
-            </ul>
+      {loading ? (
+        <PageSection background="gray">
+          <div style={{ textAlign: "center", padding: "40px 0" }}>
+            <p>Cargando servicios...</p>
           </div>
-          <div className="soporte-info-image">
-            <img
-              src="https://images.pexels.com/photos/3825540/pexels-photo-3825540.jpeg?auto=compress&cs=tinysrgb&w=800"
-              alt="Técnico de laboratorio"
-            />
+        </PageSection>
+      ) : servicios.length > 0 ? (
+        servicios.map((servicio, index) => (
+          <PageSection
+            key={servicio.id}
+            background={index % 2 === 0 ? "white" : "gray"}
+          >
+            <div className="servicio-section">
+              <h2 className="servicio-titulo">{servicio.titulo}</h2>
+              <div className="servicio-content">
+                {servicio.imagen_url && (
+                  <div className="servicio-imagen">
+                    <img src={servicio.imagen_url} alt={servicio.titulo} />
+                  </div>
+                )}
+                <div className="servicio-descripcion">
+                  <p>{servicio.descripcion}</p>
+                </div>
+              </div>
+            </div>
+          </PageSection>
+        ))
+      ) : (
+        <PageSection background="gray">
+          <div style={{ textAlign: "center", padding: "40px 0" }}>
+            <p>No hay servicios disponibles en este momento.</p>
           </div>
-        </div>
-      </PageSection>
+        </PageSection>
+      )}
 
       <PageSection>
         <div className="soporte-contact">
-          <SectionTitle
-            title="Solicite Soporte Técnico"
-            subtitle="Complete el formulario y nuestro equipo se pondrá en contacto con usted"
-          />
+          <h2 className="section-main-title">Solicite Soporte Técnico</h2>
+          <p className="contact-subtitle">
+            Complete el formulario y nuestro equipo se pondrá en contacto con
+            usted
+          </p>
           <form className="soporte-form" onSubmit={handleSubmit}>
             <div className="form-row">
               <div className="form-group">

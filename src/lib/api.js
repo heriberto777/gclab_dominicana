@@ -441,6 +441,41 @@ class ApiClient {
     });
     return { data, error: null };
   }
+
+  async getServiciosTecnicos(activo = true) {
+    const data = await this.request(
+      `/servicios-tecnicos${activo !== false ? "?activo=true" : ""}`
+    );
+    return { data, error: null };
+  }
+
+  async getServicioTecnico(id) {
+    const data = await this.request(`/servicios-tecnicos/${id}`);
+    return { data, error: null };
+  }
+
+  async createServicioTecnico(servicio) {
+    const data = await this.request("/servicios-tecnicos", {
+      method: "POST",
+      body: JSON.stringify(servicio),
+    });
+    return { data, error: null };
+  }
+
+  async updateServicioTecnico(id, servicio) {
+    const data = await this.request(`/servicios-tecnicos/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(servicio),
+    });
+    return { data, error: null };
+  }
+
+  async deleteServicioTecnico(id) {
+    const data = await this.request(`/servicios-tecnicos/${id}`, {
+      method: "DELETE",
+    });
+    return { data, error: null };
+  }
 }
 
 export const apiClient = new ApiClient();
