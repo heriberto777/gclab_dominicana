@@ -12,6 +12,7 @@ const industriasRoutes = require("./routes/industrias");
 const heroesRoutes = require("./routes/heroes");
 const mercadosRoutes = require("./routes/mercados");
 const serviciosTecnicosRoutes = require("./routes/serviciosTecnicos");
+const chatbotRoutes = require("./routes/chatbot");
 
 const app = express();
 
@@ -66,6 +67,7 @@ app.use("/api/industrias", industriasRoutes);
 app.use("/api/heroes", heroesRoutes);
 app.use("/api/mercados", mercadosRoutes);
 app.use("/api/servicios-tecnicos", serviciosTecnicosRoutes);
+app.use("/api/chatbot", chatbotRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });

@@ -476,6 +476,41 @@ class ApiClient {
     });
     return { data, error: null };
   }
+
+   async getChatbotStats() {
+    const data = await this.request('/chatbot/stats');
+    return { data, error: null };
+  }
+
+  async searchProductosChatbot(query, limit = 5) {
+    const data = await this.request('/chatbot/search/productos', {
+      method: 'POST',
+      body: JSON.stringify({ query, limit })
+    });
+    return { data, error: null };
+  }
+
+  async searchCategoriasChatbot() {
+    const data = await this.request('/chatbot/search/categorias', {
+      method: 'POST'
+    });
+    return { data, error: null };
+  }
+
+  async searchMercadosChatbot() {
+    const data = await this.request('/chatbot/search/mercados', {
+      method: 'POST'
+    });
+    return { data, error: null };
+  }
+
+  async searchServiciosChatbot() {
+    const data = await this.request('/chatbot/search/servicios', {
+      method: 'POST'
+    });
+    return { data, error: null };
+  }
+
 }
 
 export const apiClient = new ApiClient();
