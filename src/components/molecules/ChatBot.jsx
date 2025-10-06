@@ -1,5 +1,6 @@
 // src/components/molecules/ChatBot.jsx
 import { useState, useRef, useEffect } from "react";
+import { apiClient } from "../../lib/api"; // ← Importar apiClient
 import "./ChatBot.css";
 
 const ChatBot = ({ webhookUrl = "" }) => {
@@ -26,24 +27,70 @@ const ChatBot = ({ webhookUrl = "" }) => {
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      // Generar sessionId único
-      const newSessionId = `session_${Date.now()}_${Math.random()
-        .toString(36)
-        .substr(2, 9)}`;
-      setSessionId(newSessionId);
-
-      // Mensaje de bienvenida
-      setTimeout(() => {
-        const welcomeMessage = {
-          id: Date.now(),
-          text: "¡Hola! Soy el asistente virtual de GC Lab. Puedo ayudarte con información sobre nuestros productos, servicios técnicos y mercados. ¿En qué puedo asistirte hoy?",
-          sender: "bot",
-          timestamp: new Date(),
-        };
-        setMessages([welcomeMessage]);
-      }, 500);
+      initializeChat();
     }
   }, [isOpen]);
+
+  // 🆕 Función para inicializar el chat
+  const initializeChat = async () => {
+    // 1️⃣ Generar sessionId único
+    const newSessionId = `session_${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
+    setSessionId(newSessionId);
+
+    console.log("🔑 SessionId generado:", newSessionId);
+
+    // 2️⃣ Crear conversación usando apiClient
+    try {
+      const { data, error } = await apiClient.createChatbotConversation(
+        newSessionId
+      );
+
+      if (data) {
+        console.log("✅ Conversación creada en DB:", data);
+      } else {
+        console.error("❌ Error al crear conversación:", error);
+      }
+    } catch (error) {
+      console.error("❌ Error al crear conversación:", error);
+    }
+
+    // 3️⃣ Mostrar mensaje de bienvenida
+    setTimeout(async () => {
+      const welcomeMessage = {
+        id: Date.now(),
+        text: "¡Hola! Soy el asistente virtual de GC Lab. Puedo ayudarte con información sobre nuestros productos, servicios técnicos y mercados. ¿En qué puedo asistirte hoy?",
+        sender: "bot",
+        timestamp: new Date(),
+      };
+
+      setMessages([welcomeMessage]);
+
+      // 4️⃣ Guardar mensaje de bienvenida usando apiClient
+      await saveMessage(newSessionId, "bot", welcomeMessage.text);
+    }, 500);
+  };
+
+  // 🆕 Función para guardar mensajes usando apiClient
+  const saveMessage = async (session, sender, message, metadata = {}) => {
+    try {
+      const { data, error } = await apiClient.saveChatbotMessage(
+        session,
+        sender,
+        message,
+        metadata
+      );
+
+      if (data) {
+        console.log(`✅ Mensaje (${sender}) guardado:`, data);
+      } else {
+        console.error("❌ Error al guardar mensaje:", error);
+      }
+    } catch (error) {
+      console.error("❌ Error al guardar mensaje:", error);
+    }
+  };
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
@@ -82,7 +129,7 @@ const ChatBot = ({ webhookUrl = "" }) => {
       console.error("Error sending message to webhook:", error);
       return {
         response:
-          "Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo o contáctanos directamente.",
+          "Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.",
       };
     }
   };
@@ -97,13 +144,20 @@ const ChatBot = ({ webhookUrl = "" }) => {
       timestamp: new Date(),
     };
 
+    // 1️⃣ Mostrar mensaje del usuario
     setMessages((prev) => [...prev, userMessage]);
+
+    // 2️⃣ Guardar mensaje del usuario
+    await saveMessage(sessionId, "user", inputValue);
+
     setInputValue("");
     setIsTyping(true);
 
+    // 3️⃣ Enviar a n8n
     const webhookResponse = await sendMessageToWebhook(inputValue);
 
-    setTimeout(() => {
+    // 4️⃣ Mostrar respuesta del bot
+    setTimeout(async () => {
       const botMessage = {
         id: Date.now() + 1,
         text:
@@ -112,15 +166,19 @@ const ChatBot = ({ webhookUrl = "" }) => {
         sender: "bot",
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, botMessage]);
       setIsTyping(false);
 
-      // Actualizar estado de conversación si viene en la respuesta
+      // 5️⃣ Guardar respuesta del bot
+      await saveMessage(sessionId, "bot", botMessage.text);
+
+      // 6️⃣ Actualizar estado si cambió
       if (webhookResponse.conversationState) {
         setConversationState(webhookResponse.conversationState);
       }
 
-      // Actualizar datos del cliente si vienen completos
+      // 7️⃣ Guardar datos del cliente si están completos
       if (webhookResponse.clientInfoComplete && webhookResponse.clientInfo) {
         setClientInfo(webhookResponse.clientInfo);
       }

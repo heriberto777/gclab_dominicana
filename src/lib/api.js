@@ -274,6 +274,10 @@ class ApiClient {
     return { data, error: null };
   }
 
+  // ============================================
+  // Settings
+  // ============================================
+
   async getSettings() {
     const data = await this.request("/settings");
     return { data, error: null };
@@ -291,6 +295,10 @@ class ApiClient {
     });
     return { data, error: null };
   }
+
+  // ============================================
+  // Social Media
+  // ============================================
 
   async getSocialMedia(activo = true) {
     const data = await this.request(
@@ -327,6 +335,10 @@ class ApiClient {
     return { data, error: null };
   }
 
+  // ============================================
+  // Industrias
+  // ============================================
+
   async getIndustrias(activo = true) {
     const data = await this.request(
       `/industrias${activo !== false ? "?activo=true" : ""}`
@@ -361,6 +373,10 @@ class ApiClient {
     });
     return { data, error: null };
   }
+
+  // ============================================
+  // Heroes
+  // ============================================
 
   async getHeroes(activo = true) {
     const data = await this.request(
@@ -402,6 +418,10 @@ class ApiClient {
     return { data, error: null };
   }
 
+  // ============================================
+  // Mercados
+  // ============================================
+
   async getMercados(activo = true) {
     const data = await this.request(
       `/mercados${activo !== false ? "?activo=true" : ""}`
@@ -442,6 +462,10 @@ class ApiClient {
     return { data, error: null };
   }
 
+  // ============================================
+  // Servicios Técnicos
+  // ===========================================
+
   async getServiciosTecnicos(activo = true) {
     const data = await this.request(
       `/servicios-tecnicos${activo !== false ? "?activo=true" : ""}`
@@ -477,40 +501,64 @@ class ApiClient {
     return { data, error: null };
   }
 
-   async getChatbotStats() {
-    const data = await this.request('/chatbot/stats');
+  // ============================================
+  // Chatbot (NUEVO)
+  // ============================================
+
+  async createChatbotConversation(sessionId) {
+    const data = await this.request("/chatbot/conversation/create", {
+      method: "POST",
+      body: JSON.stringify({ sessionId }),
+    });
+    return { data, error: null };
+  }
+
+  async saveChatbotMessage(sessionId, sender, message, metadata = {}) {
+    const data = await this.request("/chatbot/message/save", {
+      method: "POST",
+      body: JSON.stringify({
+        sessionId,
+        sender,
+        message,
+        metadata,
+      }),
+    });
+    return { data, error: null };
+  }
+
+  async getChatbotStats() {
+    const data = await this.request("/chatbot/stats");
     return { data, error: null };
   }
 
   async searchProductosChatbot(query, limit = 5) {
-    const data = await this.request('/chatbot/search/productos', {
-      method: 'POST',
-      body: JSON.stringify({ query, limit })
+    const data = await this.request("/chatbot/search/productos", {
+      method: "POST",
+      body: JSON.stringify({ query, limit }),
     });
     return { data, error: null };
   }
 
   async searchCategoriasChatbot() {
-    const data = await this.request('/chatbot/search/categorias', {
-      method: 'POST'
+    const data = await this.request("/chatbot/search/categorias", {
+      method: "POST",
     });
     return { data, error: null };
   }
 
   async searchMercadosChatbot() {
-    const data = await this.request('/chatbot/search/mercados', {
-      method: 'POST'
+    const data = await this.request("/chatbot/search/mercados", {
+      method: "POST",
     });
     return { data, error: null };
   }
 
   async searchServiciosChatbot() {
-    const data = await this.request('/chatbot/search/servicios', {
-      method: 'POST'
+    const data = await this.request("/chatbot/search/servicios", {
+      method: "POST",
     });
     return { data, error: null };
   }
-
 }
 
 export const apiClient = new ApiClient();
