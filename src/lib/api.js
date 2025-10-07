@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'https://catelli.ddns.net:3001/api';
+const API_URL = `${window.location.hostname}:3001/api`;
 
 class ApiClient {
   constructor() {
