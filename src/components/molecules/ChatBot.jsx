@@ -123,7 +123,9 @@ const ChatBot = ({ webhookUrl = "" }) => {
         throw new Error("Error en la respuesta del webhook");
       }
 
+      console.log(response)
       const data = await response.json();
+
       return data;
     } catch (error) {
       console.error("Error sending message to webhook:", error);
