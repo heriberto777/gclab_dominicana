@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://10.0.10.98:3001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 class ApiClient {
   constructor() {
